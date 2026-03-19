@@ -171,8 +171,7 @@ class XRDPhaseScene(Scene):
             sig = 0.06 + 0.02*t
             p1 = amp1 * np.exp(-0.5 * ((x - mu1) / sig)**2)
             p2 = amp2 * np.exp(-0.5 * ((x - mu2) / sig)**2)
-            p_cubic = (1-t) * 1.0 * np.exp(-0.5 * ((x - 45.15) / sig)**2)
-            return p1 + p2 + p_cubic
+            return p1 + p2
             
         curve = always_redraw(lambda: axes.plot(lambda x: xrd_profile(x, t_tracker.get_value()), color=YELLOW))
         self.add(curve)
@@ -190,7 +189,7 @@ class XRDPhaseScene(Scene):
         phase_lbl = always_redraw(lambda: Text(
             "Tetragonal (Piezoeléctrico)" if t_tracker.get_value() > 0.5 else "Cúbico (No piezoeléctrico)",
             font_size=22, color=RED if t_tracker.get_value() > 0.5 else BLUE
-        ).next_to(axes, UP, buff=0.4).align_to(axes, LEFT))
+        ).next_to(axes, UP, buff=0.6).align_to(axes, LEFT))
 
         self.add(peak_002_line, peak_200_line, lbl_002, lbl_200, phase_lbl)
 
