@@ -14,31 +14,31 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
 class PerovskiteCell(VGroup):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ba_atoms = [Dot(radius=0.15, color=BLUE).set_z_index(3) for _ in range(8)]
-        self.o_atoms = [Dot(radius=0.1, color=RED).set_z_index(3) for _ in range(6)]
-        self.ti_atom = Dot(radius=0.12, color=YELLOW).set_z_index(3)
-        self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_z_index(2) for _ in range(12)]
+        self.ba_atoms = [Dot(radius=0.15, color=BLUE) for _ in range(8)]
+        self.o_atoms = [Dot(radius=0.1, color=RED) for _ in range(6)]
+        self.ti_atom = Dot(radius=0.12, color=YELLOW)
+        self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2) for _ in range(12)]
         
-        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_z_index(4)
-        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_z_index(4)
-        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_z_index(4)
-        self.lbl_a = MathTex("a", font_size=24, color=WHITE).set_z_index(4)
-        self.lbl_b = MathTex("b", font_size=24, color=WHITE).set_z_index(4)
-        self.lbl_c = MathTex("c", font_size=24, color=WHITE).set_z_index(4)
+        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
+        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
+        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
+        self.lbl_a = MathTex("a", font_size=24, color=WHITE)
+        self.lbl_b = MathTex("b", font_size=24, color=WHITE)
+        self.lbl_c = MathTex("c", font_size=24, color=WHITE)
         
-        self.arc_alpha = Arc(radius=0.3, angle=PI/2, color=WHITE).set_z_index(4)
-        self.arc_beta = Arc(radius=0.3, angle=PI/2, color=WHITE).set_z_index(4)
-        self.arc_gamma = Arc(radius=0.3, angle=PI/2, color=WHITE).set_z_index(4)
-        self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE).set_z_index(4)
-        self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE).set_z_index(4)
-        self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE).set_z_index(4)
+        self.arc_alpha = Arc(radius=0.3, angle=PI/2, color=WHITE)
+        self.arc_beta = Arc(radius=0.3, angle=PI/2, color=WHITE)
+        self.arc_gamma = Arc(radius=0.3, angle=PI/2, color=WHITE)
+        self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE)
+        self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE)
+        self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE)
         
-        self.miller_002 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=BLUE, fill_opacity=0.4, stroke_width=0).set_z_index(1)
-        self.miller_200 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=RED, fill_opacity=0.4, stroke_width=0).set_z_index(1)
-        self.d002_arrow = DoubleArrow(ORIGIN, UP, color=BLUE, buff=0, max_tip_length_to_length_ratio=0.1).set_z_index(4)
-        self.d200_arrow = DoubleArrow(ORIGIN, UP, color=RED, buff=0, max_tip_length_to_length_ratio=0.1).set_z_index(4)
-        self.lbl_d002 = MathTex(r"d_{002}", font_size=20, color=BLUE).set_z_index(4)
-        self.lbl_d200 = MathTex(r"d_{200}", font_size=20, color=RED).set_z_index(4)
+        self.miller_002 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=BLUE, fill_opacity=0.4, stroke_width=0)
+        self.miller_200 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=RED, fill_opacity=0.4, stroke_width=0)
+        self.d002_arrow = DoubleArrow(ORIGIN, UP, color=BLUE, buff=0, max_tip_length_to_length_ratio=0.1)
+        self.d200_arrow = DoubleArrow(ORIGIN, UP, color=RED, buff=0, max_tip_length_to_length_ratio=0.1)
+        self.lbl_d002 = MathTex(r"d_{002}", font_size=20, color=BLUE)
+        self.lbl_d200 = MathTex(r"d_{200}", font_size=20, color=RED)
 
         self.add(*self.edges, *self.ba_atoms, *self.o_atoms, self.ti_atom)
         self.show_dimensions = False
@@ -80,18 +80,16 @@ class PerovskiteCell(VGroup):
         extras = []
         
         if self.show_dimensions:
-            pa0, _ = project_iso(corners[0][0], corners[0][1], corners[0][2], rot_z_deg=rot_angle)
-            pa1, _ = project_iso(corners[1][0], corners[1][1], corners[1][2], rot_z_deg=rot_angle)
-            self.dim_a_line.put_start_and_end_on(pa0 + offset, pa1 + offset)
-            self.lbl_a.move_to((pa0+pa1)/2 + offset + DOWN*0.3)
+            p = [project_iso(*c, rot_z_deg=rot_angle)[0] for c in corners]
             
-            pb1, _ = project_iso(corners[3][0], corners[3][1], corners[3][2], rot_z_deg=rot_angle)
-            self.dim_b_line.put_start_and_end_on(pa0 + offset, pb1 + offset)
-            self.lbl_b.move_to((pa0+pb1)/2 + offset + RIGHT*0.3)
+            self.dim_a_line.put_start_and_end_on(p[0] + offset, p[1] + offset)
+            self.lbl_a.move_to((p[0]+p[1])/2 + offset + DOWN*0.3)
             
-            pc4, _ = project_iso(corners[4][0], corners[4][1], corners[4][2], rot_z_deg=rot_angle)
-            self.dim_c_line.put_start_and_end_on(pa0 + offset, pc4 + offset)
-            self.lbl_c.move_to((pa0+pc4)/2 + offset + LEFT*0.3)
+            self.dim_b_line.put_start_and_end_on(p[1] + offset, p[2] + offset)
+            self.lbl_b.move_to((p[1]+p[2])/2 + offset + RIGHT*0.3)
+            
+            self.dim_c_line.put_start_and_end_on(p[0] + offset, p[4] + offset)
+            self.lbl_c.move_to((p[0]+p[4])/2 + offset + LEFT*0.3)
             
             def draw_arc(o, v1, v2, radius=0.4):
                 u = v1 - o
@@ -103,14 +101,14 @@ class PerovskiteCell(VGroup):
                 elif diff < -PI: diff += TAU
                 return Arc(radius=radius, start_angle=a1, angle=diff, arc_center=o+offset, color=WHITE)
             
-            self.arc_gamma.become(draw_arc(pa0, pa1, pb1))
-            self.lbl_gamma.move_to(pa0 + offset + (pa1-pa0)*0.3 + (pb1-pa0)*0.3)
+            self.arc_gamma.become(draw_arc(p[1], p[0], p[2]))
+            self.lbl_gamma.move_to(p[1] + offset + (p[0]-p[1])*0.3 + (p[2]-p[1])*0.3)
             
-            self.arc_beta.become(draw_arc(pa0, pa1, pc4))
-            self.lbl_beta.move_to(pa0 + offset + (pa1-pa0)*0.3 + (pc4-pa0)*0.3)
+            self.arc_beta.become(draw_arc(p[0], p[1], p[4]))
+            self.lbl_beta.move_to(p[0] + offset + (p[1]-p[0])*0.3 + (p[4]-p[0])*0.3)
             
-            self.arc_alpha.become(draw_arc(pa0, pb1, pc4))
-            self.lbl_alpha.move_to(pa0 + offset + (pb1-pa0)*0.3 + (pc4-pa0)*0.3)
+            self.arc_alpha.become(draw_arc(p[4], p[0], p[5]))
+            self.lbl_alpha.move_to(p[4] + offset + (p[0]-p[4])*0.3 + (p[5]-p[4])*0.3)
             
             extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.arc_gamma, self.lbl_gamma, self.arc_beta, self.lbl_beta, self.arc_alpha, self.lbl_alpha])
             
