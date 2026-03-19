@@ -85,22 +85,34 @@ class PerovskiteCell(VGroup):
             self.dim_a_line.put_start_and_end_on(pa0 + offset, pa1 + offset)
             self.lbl_a.move_to((pa0+pa1)/2 + offset + DOWN*0.3)
             
-            pb1, _ = project_iso(corners[1][0], corners[1][1], corners[1][2], rot_z_deg=rot_angle)
-            pb2, _ = project_iso(corners[2][0], corners[2][1], corners[2][2], rot_z_deg=rot_angle)
-            self.dim_b_line.put_start_and_end_on(pb1 + offset, pb2 + offset)
-            self.lbl_b.move_to((pb1+pb2)/2 + offset + RIGHT*0.3)
+            pb1, _ = project_iso(corners[3][0], corners[3][1], corners[3][2], rot_z_deg=rot_angle)
+            self.dim_b_line.put_start_and_end_on(pa0 + offset, pb1 + offset)
+            self.lbl_b.move_to((pa0+pb1)/2 + offset + RIGHT*0.3)
             
-            pc0, _ = project_iso(corners[0][0], corners[0][1], corners[0][2], rot_z_deg=rot_angle)
             pc4, _ = project_iso(corners[4][0], corners[4][1], corners[4][2], rot_z_deg=rot_angle)
-            self.dim_c_line.put_start_and_end_on(pc0 + offset, pc4 + offset)
-            self.lbl_c.move_to((pc0+pc4)/2 + offset + LEFT*0.3)
+            self.dim_c_line.put_start_and_end_on(pa0 + offset, pc4 + offset)
+            self.lbl_c.move_to((pa0+pc4)/2 + offset + LEFT*0.3)
             
-            self.arc_gamma = Angle(self.dim_a_line, self.dim_b_line, radius=0.4, color=WHITE)
-            self.lbl_gamma.next_to(self.arc_gamma, UR, buff=0.1)
-            self.arc_beta = Angle(self.dim_a_line, self.dim_c_line, radius=0.4, color=WHITE)
-            self.lbl_beta.next_to(self.arc_beta, UL, buff=0.1)
+            def draw_arc(o, v1, v2, radius=0.4):
+                u = v1 - o
+                v = v2 - o
+                a1 = np.arctan2(u[1], u[0])
+                a2 = np.arctan2(v[1], v[0])
+                diff = (a2 - a1) % TAU
+                if diff > PI: diff -= TAU
+                elif diff < -PI: diff += TAU
+                return Arc(radius=radius, start_angle=a1, angle=diff, arc_center=o+offset, color=WHITE)
             
-            extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.arc_gamma, self.lbl_gamma, self.arc_beta, self.lbl_beta])
+            self.arc_gamma.become(draw_arc(pa0, pa1, pb1))
+            self.lbl_gamma.move_to(pa0 + offset + (pa1-pa0)*0.3 + (pb1-pa0)*0.3)
+            
+            self.arc_beta.become(draw_arc(pa0, pa1, pc4))
+            self.lbl_beta.move_to(pa0 + offset + (pa1-pa0)*0.3 + (pc4-pa0)*0.3)
+            
+            self.arc_alpha.become(draw_arc(pa0, pb1, pc4))
+            self.lbl_alpha.move_to(pa0 + offset + (pb1-pa0)*0.3 + (pc4-pa0)*0.3)
+            
+            extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.arc_gamma, self.lbl_gamma, self.arc_beta, self.lbl_beta, self.arc_alpha, self.lbl_alpha])
             
         if self.show_miller:
             m002_corn = [[-a/2, -b/2, 0], [a/2, -b/2, 0], [a/2, b/2, 0], [-a/2, b/2, 0]]
@@ -145,6 +157,15 @@ class Scene1_UnitCell(Scene):
         
         self.play(FadeIn(cell))
         self.play(angle_tracker.animate.increment_value(90), run_time=4)
+        
+        txt_ba = Tex(r"Bario (Ba): Esquinas", font_size=28, color=BLUE).to_edge(LEFT, buff=1.0).shift(UP*1)
+        txt_o = Tex(r"Oxígeno (O): Caras", font_size=28, color=RED).next_to(txt_ba, DOWN, aligned_edge=LEFT, buff=0.5)
+        txt_ti = Tex(r"Titanio (Ti): Centro", font_size=28, color=YELLOW).next_to(txt_o, DOWN, aligned_edge=LEFT, buff=0.5)
+        
+        self.play(Write(txt_ba))
+        self.play(Write(txt_o))
+        self.play(Write(txt_ti))
+        self.wait(3)
         
         txt_sym = MathTex(r"\text{Alta simetría perfecta: } a = b = c \text{ y } \alpha = \beta = \gamma = 90^\circ", font_size=36).to_edge(UP, buff=1.0)
         self.play(Transform(txt1, txt_sym))
