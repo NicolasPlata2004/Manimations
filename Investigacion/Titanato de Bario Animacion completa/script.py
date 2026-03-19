@@ -14,27 +14,14 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
 
 class Scene0_Intro(Scene):
     def construct(self):
-        logo = VGroup()
-        hex_out = RegularPolygon(n=6, start_angle=PI/2, color=WHITE).set_stroke(width=15)
-        
-        v = RegularPolygon(n=6, start_angle=PI/2).scale(0.88).get_vertices()
-        p_bot_mid = v[3] + np.array([-0.3, 0.2, 0])
-        left_poly = Polygon(v[0], v[1], v[2], p_bot_mid, color=WHITE, stroke_width=0).set_fill(WHITE, 1)
-        
-        p_r_top1 = v[0] + np.array([0.15, -0.05, 0])
-        p_r_top2 = v[0] + np.array([0.35, -0.15, 0])
-        p_r_bot1 = v[4] + np.array([-0.3, 0.15, 0])
-        p_r_bot2 = v[4] + np.array([-0.1, 0.05, 0])
-        right_poly = Polygon(p_r_top1, p_r_top2, p_r_bot2, p_r_bot1, color=WHITE, stroke_width=0).set_fill(WHITE, 1)
-        
-        logo.add(hex_out, left_poly, right_poly)
-        logo.scale(1.2)
+        logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
+        logo = ImageMobject(logo_path).set_height(2.5)
         
         kyma_text = Text("KYMA", font_size=100, weight=BOLD, color=WHITE)
-        full_logo = VGroup(logo, kyma_text).arrange(RIGHT, buff=1.0)
+        full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         full_logo.move_to(UP*1.0)
         
-        self.play(DrawBorderThenFill(logo), run_time=2.0)
+        self.play(FadeIn(logo, shift=UP*0.5), run_time=1.5)
         self.play(Write(kyma_text), run_time=1.0)
         self.wait(0.5)
         
