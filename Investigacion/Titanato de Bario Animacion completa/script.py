@@ -19,9 +19,9 @@ class PerovskiteCell(VGroup):
         self.ti_atom = Dot(radius=0.12, color=YELLOW)
         self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2) for _ in range(12)]
         
-        self.dim_a_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
-        self.dim_b_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
-        self.dim_c_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
+        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
         self.lbl_a = MathTex("a", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_b = MathTex("b", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_c = MathTex("c", font_size=24, color=WHITE).set_opacity(0)
@@ -165,18 +165,54 @@ class PerovskiteCell(VGroup):
 
 class Scene1_UnitCell(Scene):
     def construct(self):
-        title = Tex(r"Alta simetría perfecta: $a = b = c$ y $\alpha = \beta = \gamma = 90^\circ$", font_size=36, color=WHITE).to_edge(UP, buff=0.5)
-        subtitle = MathTex(r"a = b = c", font_size=32, color=RED).next_to(title, DOWN, buff=0.2)
+        txt1 = Tex(r"El Titanato de Bario ($BaTiO_3$) es un material cristalino.", font_size=36).to_edge(UP, buff=1.0)
+        self.play(Write(txt1), run_time=2)
+        self.wait(2)
+        txt2 = Tex(r"Su estructura básica se repite millones de veces.", font_size=36).to_edge(UP, buff=1.0)
+        self.play(Transform(txt1, txt2))
+        self.wait(2)
+
+        grid = VGroup()
+        for x in range(3):
+            for y in range(3):
+                for z in range(3):
+                    pt, depth = project_iso((x-1)*1.5, (y-1)*1.5, (z-1)*1.5, rot_z_deg=45)
+                    d = Dot(pt, radius=0.08, color=BLUE)
+                    d.depth = depth
+                    grid.add(d)
+                    
+        grid.submobjects.sort(key=lambda m: m.depth, reverse=True)
+        self.play(FadeIn(grid, shift=UP), run_time=2.5)
+        self.wait(2.5)
+
+        self.play(grid.animate.scale(2), run_time=1.5)
+        self.play(FadeOut(grid), run_time=1.0)
         
-        txt_ba = Tex(r"Bario (Ba): Esquinas", font_size=28, color=BLUE)
-        txt_o = Tex(r"Oxígeno (O): Caras", font_size=28, color=RED)
-        txt_ti = Tex(r"Titanio (Ti): Centro", font_size=28, color=YELLOW)
-        legend = VGroup(txt_ba, txt_o, txt_ti).arrange(DOWN, aligned_edge=LEFT, buff=0.5).to_edge(LEFT, buff=0.5)
+        txt3 = Tex(r"Estructura Cúbica ($T > 120^\circ\text{C}$).", font_size=32).to_edge(UP, buff=1.0)
+        self.play(Transform(txt1, txt3))
+        self.wait(2)
 
-        self.play(Write(title), Write(subtitle))
-        self.play(FadeIn(legend, shift=RIGHT))
-        self.wait(1)
-
+        cell = PerovskiteCell()
+        cell.scale(1.5).shift(DOWN*0.5)
+        angle_tracker = ValueTracker(20)
+        cell.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), DOWN*0.5))
+        
+        self.play(FadeIn(cell))
+        self.play(angle_tracker.animate.increment_value(90), run_time=4)
+        
+        txt_ba = Tex(r"Bario (Ba): Esquinas", font_size=28, color=BLUE).to_edge(LEFT, buff=1.0).shift(UP*1)
+        txt_o = Tex(r"Oxígeno (O): Caras", font_size=28, color=RED).next_to(txt_ba, DOWN, aligned_edge=LEFT, buff=0.5)
+        txt_ti = Tex(r"Titanio (Ti): Centro", font_size=28, color=YELLOW).next_to(txt_o, DOWN, aligned_edge=LEFT, buff=0.5)
+        
+        self.play(Write(txt_ba))
+        self.play(Write(txt_o))
+        self.play(Write(txt_ti))
+        self.wait(3)
+        
+        txt_sym = MathTex(r"\text{Alta simetría perfecta: } a = b = c \text{ y } \alpha = \beta = \gamma = 90^\circ", font_size=36).to_edge(UP, buff=1.0)
+        self.play(Transform(txt1, txt_sym))
+        self.wait(2)
+        
         cube1 = PerovskiteCell()
         for o in cube1.o_atoms: o.set_opacity(0)
         cube1.ti_atom.set_opacity(0)
@@ -191,17 +227,25 @@ class Scene1_UnitCell(Scene):
         cube2.scale(1.2).shift(RIGHT*2.5 + DOWN*0.5)
         lbl_cube2 = Tex("Parámetros de Red", font_size=24).next_to(cube2, DOWN, buff=0.5)
         
-        self.play(FadeIn(cube1), FadeIn(cube2))
-        self.play(Write(lbl_cube1), Write(lbl_cube2))
+        txt_subtitle = MathTex(r"a = b = c", font_size=32, color=RED).next_to(txt_sym, DOWN, buff=0.2)
         
-        angle_tracker = ValueTracker(20)
+        cell.clear_updaters()
+        self.play(
+            FadeOut(cell),
+            FadeIn(cube1),
+            FadeIn(cube2),
+            Write(lbl_cube1),
+            Write(lbl_cube2),
+            Write(txt_subtitle)
+        )
+        
         cube1.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), LEFT*2.5 + DOWN*0.5))
         cube2.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), RIGHT*2.5 + DOWN*0.5))
         
         self.play(angle_tracker.animate.increment_value(90), run_time=6, rate_func=smooth)
         self.wait(4)
         
-        self.play(FadeOut(VGroup(title, subtitle, legend, cube1, cube2, lbl_cube1, lbl_cube2)))
+        self.play(FadeOut(Group(*self.mobjects)))
 
 
 class Scene2_SEM(Scene):
