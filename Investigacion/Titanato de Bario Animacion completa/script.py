@@ -26,9 +26,6 @@ class PerovskiteCell(VGroup):
         self.lbl_b = MathTex("b", font_size=24, color=WHITE)
         self.lbl_c = MathTex("c", font_size=24, color=WHITE)
         
-        self.arc_alpha = Arc(radius=0.3, angle=PI/2, color=WHITE)
-        self.arc_beta = Arc(radius=0.3, angle=PI/2, color=WHITE)
-        self.arc_gamma = Arc(radius=0.3, angle=PI/2, color=WHITE)
         self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE)
         self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE)
         self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE)
@@ -91,26 +88,11 @@ class PerovskiteCell(VGroup):
             self.dim_c_line.put_start_and_end_on(p[0] + offset, p[4] + offset)
             self.lbl_c.move_to((p[0]+p[4])/2 + offset + LEFT*0.3)
             
-            def draw_arc(o, v1, v2, radius=0.4):
-                u = v1 - o
-                v = v2 - o
-                a1 = np.arctan2(u[1], u[0])
-                a2 = np.arctan2(v[1], v[0])
-                diff = (a2 - a1) % TAU
-                if diff > PI: diff -= TAU
-                elif diff < -PI: diff += TAU
-                return Arc(radius=radius, start_angle=a1, angle=diff, arc_center=o+offset, color=WHITE)
-            
-            self.arc_gamma.become(draw_arc(p[1], p[0], p[2]))
             self.lbl_gamma.move_to(p[1] + offset + (p[0]-p[1])*0.3 + (p[2]-p[1])*0.3)
-            
-            self.arc_beta.become(draw_arc(p[0], p[1], p[4]))
             self.lbl_beta.move_to(p[0] + offset + (p[1]-p[0])*0.3 + (p[4]-p[0])*0.3)
-            
-            self.arc_alpha.become(draw_arc(p[4], p[0], p[5]))
             self.lbl_alpha.move_to(p[4] + offset + (p[0]-p[4])*0.3 + (p[5]-p[4])*0.3)
             
-            extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.arc_gamma, self.lbl_gamma, self.arc_beta, self.lbl_beta, self.arc_alpha, self.lbl_alpha])
+            extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_gamma, self.lbl_beta, self.lbl_alpha])
             
         if self.show_miller:
             m002_corn = [[-a/2, -b/2, 0], [a/2, -b/2, 0], [a/2, b/2, 0], [-a/2, b/2, 0]]
@@ -146,6 +128,26 @@ class Scene1_UnitCell(Scene):
         self.wait(2)
         txt2 = Tex(r"Su estructura básica se repite millones de veces.", font_size=36).to_edge(UP, buff=1.0)
         self.play(Transform(txt1, txt2))
+        self.wait(2)
+
+        grid = VGroup()
+        for x in range(3):
+            for y in range(3):
+                for z in range(3):
+                    pt, depth = project_iso((x-1)*1.5, (y-1)*1.5, (z-1)*1.5, rot_z_deg=45)
+                    d = Dot(pt, radius=0.08, color=BLUE)
+                    d.depth = depth
+                    grid.add(d)
+                    
+        grid.submobjects.sort(key=lambda m: m.depth, reverse=True)
+        self.play(FadeIn(grid, shift=UP), run_time=2.5)
+        self.wait(2.5)
+
+        self.play(grid.animate.scale(2), run_time=1.5)
+        self.play(FadeOut(grid), run_time=1.0)
+        
+        txt3 = Tex(r"Estructura Cúbica ($T > 120^\circ\text{C}$).", font_size=32).to_edge(UP, buff=1.0)
+        self.play(Transform(txt1, txt3))
         self.wait(2)
 
         cell = PerovskiteCell()
