@@ -19,9 +19,9 @@ class PerovskiteCell(VGroup):
         self.ti_atom = Dot(radius=0.12, color=YELLOW)
         self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2) for _ in range(12)]
         
-        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
-        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
-        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_a_line = DoubleArrow(ORIGIN, UP, color=WHITE, buff=0, max_tip_length_to_length_ratio=0.15, stroke_width=2).set_opacity(0)
+        self.dim_b_line = DoubleArrow(ORIGIN, UP, color=WHITE, buff=0, max_tip_length_to_length_ratio=0.15, stroke_width=2).set_opacity(0)
+        self.dim_c_line = DoubleArrow(ORIGIN, UP, color=WHITE, buff=0, max_tip_length_to_length_ratio=0.15, stroke_width=2).set_opacity(0)
         self.lbl_a = MathTex("a", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_b = MathTex("b", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_c = MathTex("c", font_size=24, color=WHITE).set_opacity(0)
@@ -219,15 +219,19 @@ class Scene1_UnitCell(Scene):
         cube1.show_angles = True
         cube1.show_dimensions = False
         cube1.scale(1.2).shift(LEFT*2.5 + DOWN*0.5)
-        lbl_cube1 = Tex("Ángulos Inter-axiales", font_size=24).next_to(cube1, DOWN, buff=0.5)
+        lbl_cube1 = Tex("Ángulos Inter-axiales", font_size=24).move_to(LEFT*2.5 + DOWN*3.1)
         
         cube2 = PerovskiteCell()
         cube2.show_angles = False
         cube2.show_dimensions = True
         cube2.scale(1.2).shift(RIGHT*2.5 + DOWN*0.5)
-        lbl_cube2 = Tex("Parámetros de Red", font_size=24).next_to(cube2, DOWN, buff=0.5)
+        lbl_cube2 = Tex("Parámetros de Red", font_size=24).move_to(RIGHT*2.5 + DOWN*3.1)
         
         txt_subtitle = MathTex(r"a = b = c", font_size=32, color=RED).next_to(txt_sym, DOWN, buff=0.2)
+        
+        # Pre-tick updaters manually to set geometries physically before the FadeIn targets their states
+        cube1.update_cell(0, angle_tracker.get_value(), LEFT*2.5 + DOWN*0.5)
+        cube2.update_cell(0, angle_tracker.get_value(), RIGHT*2.5 + DOWN*0.5)
         
         cell.clear_updaters()
         self.play(
