@@ -19,16 +19,19 @@ class PerovskiteCell(VGroup):
         self.ti_atom = Dot(radius=0.12, color=YELLOW)
         self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2) for _ in range(12)]
         
-        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
-        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
-        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_a_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
+        self.dim_b_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
+        self.dim_c_line = Line(ORIGIN, UP, color=RED, stroke_width=2).set_opacity(0)
         self.lbl_a = MathTex("a", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_b = MathTex("b", font_size=24, color=WHITE).set_opacity(0)
         self.lbl_c = MathTex("c", font_size=24, color=WHITE).set_opacity(0)
         
-        self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE).set_opacity(0)
-        self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE).set_opacity(0)
-        self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE).set_opacity(0)
+        self.arc_alpha = Arc(radius=0.4, color=WHITE).set_opacity(0).set_fill(opacity=0)
+        self.arc_beta = Arc(radius=0.4, color=WHITE).set_opacity(0).set_fill(opacity=0)
+        self.arc_gamma = Arc(radius=0.4, color=WHITE).set_opacity(0).set_fill(opacity=0)
+        self.lbl_alpha = MathTex(r"\alpha", font_size=20, color=WHITE).set_opacity(0)
+        self.lbl_beta = MathTex(r"\beta", font_size=20, color=WHITE).set_opacity(0)
+        self.lbl_gamma = MathTex(r"\gamma", font_size=20, color=WHITE).set_opacity(0)
         
         self.miller_002 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=BLUE, stroke_width=0).set_fill(BLUE, 0)
         self.miller_200 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=RED, stroke_width=0).set_fill(RED, 0)
@@ -37,16 +40,17 @@ class PerovskiteCell(VGroup):
         self.lbl_d002 = MathTex(r"d_{002}", font_size=20, color=BLUE).set_opacity(0)
         self.lbl_d200 = MathTex(r"d_{200}", font_size=20, color=RED).set_opacity(0)
 
-        # Add EVERYTHING statically. Never modify self.submobjects again!
         self.add(
             self.miller_002, self.miller_200, 
             *self.edges, *self.ba_atoms, *self.o_atoms, self.ti_atom,
             self.dim_a_line, self.dim_b_line, self.dim_c_line,
             self.lbl_a, self.lbl_b, self.lbl_c,
+            self.arc_alpha, self.arc_beta, self.arc_gamma,
             self.lbl_alpha, self.lbl_beta, self.lbl_gamma,
             self.d002_arrow, self.d200_arrow, self.lbl_d002, self.lbl_d200
         )
         self.show_dimensions = False
+        self.show_angles = False
         self.show_miller = False
 
     def update_cell(self, t_val, rot_angle, offset=ORIGIN):
@@ -83,25 +87,50 @@ class PerovskiteCell(VGroup):
             
         # Toggles behavior using purely opacity to preserve geometry indices safely
         if self.show_dimensions:
-            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
+            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c]:
                 mob.set_opacity(1)
                 mob.set_z_index(100)
                 
             p = [project_iso(*c, rot_z_deg=rot_angle)[0] for c in corners]
-            self.dim_a_line.put_start_and_end_on(p[0] + offset, p[1] + offset)
-            self.lbl_a.move_to((p[0]+p[1])/2 + offset + DOWN*0.3)
+            self.dim_a_line.put_start_and_end_on(p[1] + offset, p[5] + offset)
+            self.lbl_a.move_to((p[1]+p[5])/2 + offset + DOWN*0.3)
             
-            self.dim_b_line.put_start_and_end_on(p[1] + offset, p[2] + offset)
-            self.lbl_b.move_to((p[1]+p[2])/2 + offset + RIGHT*0.3)
+            self.dim_b_line.put_start_and_end_on(p[5] + offset, p[6] + offset)
+            self.lbl_b.move_to((p[5]+p[6])/2 + offset + RIGHT*0.3)
             
-            self.dim_c_line.put_start_and_end_on(p[0] + offset, p[4] + offset)
-            self.lbl_c.move_to((p[0]+p[4])/2 + offset + LEFT*0.3)
-            
-            self.lbl_gamma.move_to(p[1] + offset + (p[0]-p[1])*0.3 + (p[2]-p[1])*0.3)
-            self.lbl_beta.move_to(p[0] + offset + (p[1]-p[0])*0.3 + (p[4]-p[0])*0.3)
-            self.lbl_alpha.move_to(p[4] + offset + (p[0]-p[4])*0.3 + (p[5]-p[4])*0.3)
+            self.dim_c_line.put_start_and_end_on(p[4] + offset, p[7] + offset)
+            self.lbl_c.move_to((p[4]+p[7])/2 + offset + LEFT*0.3)
         else:
-            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
+            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c]:
+                mob.set_opacity(0)
+                
+        if self.show_angles:
+            for mob in [self.arc_alpha, self.arc_beta, self.arc_gamma, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
+                mob.set_opacity(1)
+                mob.set_z_index(100)
+            
+            p = [project_iso(*c, rot_z_deg=rot_angle)[0] for c in corners]
+            
+            def draw_arc(o, v1, v2, radius=0.4):
+                u = v1 - o
+                v = v2 - o
+                a1 = np.arctan2(u[1], u[0])
+                a2 = np.arctan2(v[1], v[0])
+                diff = (a2 - a1) % TAU
+                if diff > PI: diff -= TAU
+                elif diff < -PI: diff += TAU
+                return Arc(radius=radius, start_angle=a1, angle=diff, arc_center=o+offset, color=WHITE).set_fill(opacity=0).set_z_index(100)
+                
+            o = p[4]
+            self.arc_gamma.become(draw_arc(o, p[5], p[0]))
+            self.arc_alpha.become(draw_arc(o, p[7], p[0]))
+            self.arc_beta.become(draw_arc(o, p[5], p[7]))
+            
+            self.lbl_gamma.move_to(o + offset + (p[5]-o)*0.3 + (p[0]-o)*0.3)
+            self.lbl_alpha.move_to(o + offset + (p[7]-o)*0.3 + (p[0]-o)*0.3)
+            self.lbl_beta.move_to(o + offset + (p[5]-o)*0.3 + (p[7]-o)*0.3)
+        else:
+            for mob in [self.arc_alpha, self.arc_beta, self.arc_gamma, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
                 mob.set_opacity(0)
                 
         if self.show_miller:
@@ -136,56 +165,43 @@ class PerovskiteCell(VGroup):
 
 class Scene1_UnitCell(Scene):
     def construct(self):
-        txt1 = Tex(r"El Titanato de Bario ($BaTiO_3$) es un material cristalino.", font_size=36).to_edge(UP, buff=1.0)
-        self.play(Write(txt1), run_time=2)
-        self.wait(2)
-        txt2 = Tex(r"Su estructura básica se repite millones de veces.", font_size=36).to_edge(UP, buff=1.0)
-        self.play(Transform(txt1, txt2))
-        self.wait(2)
-
-        grid = VGroup()
-        for x in range(3):
-            for y in range(3):
-                for z in range(3):
-                    pt, depth = project_iso((x-1)*1.5, (y-1)*1.5, (z-1)*1.5, rot_z_deg=45)
-                    d = Dot(pt, radius=0.08, color=BLUE)
-                    d.depth = depth
-                    grid.add(d)
-                    
-        grid.submobjects.sort(key=lambda m: m.depth, reverse=True)
-        self.play(FadeIn(grid, shift=UP), run_time=2.5)
-        self.wait(2.5)
-
-        self.play(grid.animate.scale(2), run_time=1.5)
-        self.play(FadeOut(grid), run_time=1.0)
+        title = Tex(r"Alta simetría perfecta: $a = b = c$ y $\alpha = \beta = \gamma = 90^\circ$", font_size=36, color=WHITE).to_edge(UP, buff=0.5)
+        subtitle = MathTex(r"a = b = c", font_size=32, color=RED).next_to(title, DOWN, buff=0.2)
         
-        txt3 = Tex(r"Estructura Cúbica ($T > 120^\circ\text{C}$).", font_size=32).to_edge(UP, buff=1.0)
-        self.play(Transform(txt1, txt3))
-        self.wait(2)
+        txt_ba = Tex(r"Bario (Ba): Esquinas", font_size=28, color=BLUE)
+        txt_o = Tex(r"Oxígeno (O): Caras", font_size=28, color=RED)
+        txt_ti = Tex(r"Titanio (Ti): Centro", font_size=28, color=YELLOW)
+        legend = VGroup(txt_ba, txt_o, txt_ti).arrange(DOWN, aligned_edge=LEFT, buff=0.5).to_edge(LEFT, buff=0.5)
 
-        cell = PerovskiteCell()
-        cell.scale(1.5).shift(DOWN*0.5)
+        self.play(Write(title), Write(subtitle))
+        self.play(FadeIn(legend, shift=RIGHT))
+        self.wait(1)
+
+        cube1 = PerovskiteCell()
+        for o in cube1.o_atoms: o.set_opacity(0)
+        cube1.ti_atom.set_opacity(0)
+        cube1.show_angles = True
+        cube1.show_dimensions = False
+        cube1.scale(1.2).shift(LEFT*2.5 + DOWN*0.5)
+        lbl_cube1 = Tex("Ángulos Inter-axiales", font_size=24).next_to(cube1, DOWN, buff=0.5)
+        
+        cube2 = PerovskiteCell()
+        cube2.show_angles = False
+        cube2.show_dimensions = True
+        cube2.scale(1.2).shift(RIGHT*2.5 + DOWN*0.5)
+        lbl_cube2 = Tex("Parámetros de Red", font_size=24).next_to(cube2, DOWN, buff=0.5)
+        
+        self.play(FadeIn(cube1), FadeIn(cube2))
+        self.play(Write(lbl_cube1), Write(lbl_cube2))
+        
         angle_tracker = ValueTracker(20)
-        cell.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), DOWN*0.5))
+        cube1.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), LEFT*2.5 + DOWN*0.5))
+        cube2.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), RIGHT*2.5 + DOWN*0.5))
         
-        self.play(FadeIn(cell))
-        self.play(angle_tracker.animate.increment_value(90), run_time=4)
+        self.play(angle_tracker.animate.increment_value(90), run_time=6, rate_func=smooth)
+        self.wait(4)
         
-        txt_ba = Tex(r"Bario (Ba): Esquinas", font_size=28, color=BLUE).to_edge(LEFT, buff=1.0).shift(UP*1)
-        txt_o = Tex(r"Oxígeno (O): Caras", font_size=28, color=RED).next_to(txt_ba, DOWN, aligned_edge=LEFT, buff=0.5)
-        txt_ti = Tex(r"Titanio (Ti): Centro", font_size=28, color=YELLOW).next_to(txt_o, DOWN, aligned_edge=LEFT, buff=0.5)
-        
-        self.play(Write(txt_ba))
-        self.play(Write(txt_o))
-        self.play(Write(txt_ti))
-        self.wait(3)
-        
-        txt_sym = MathTex(r"\text{Alta simetría perfecta: } a = b = c \text{ y } \alpha = \beta = \gamma = 90^\circ", font_size=36).to_edge(UP, buff=1.0)
-        self.play(Transform(txt1, txt_sym))
-        
-        cell.show_dimensions = True
-        self.wait(5)
-        self.play(FadeOut(Group(*self.mobjects)))
+        self.play(FadeOut(VGroup(title, subtitle, legend, cube1, cube2, lbl_cube1, lbl_cube2)))
 
 
 class Scene2_SEM(Scene):
