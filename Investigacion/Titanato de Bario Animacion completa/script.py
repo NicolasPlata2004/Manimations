@@ -17,11 +17,11 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        kyma_text = Text("KYMA", font_size=100, weight=BOLD, color=WHITE)
+        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}", font_size=110, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         full_logo.move_to(UP*1.0)
         
-        self.play(FadeIn(logo, shift=UP*0.5), run_time=1.5)
+        self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5)
         self.play(Write(kyma_text), run_time=1.0)
         self.wait(0.5)
         
