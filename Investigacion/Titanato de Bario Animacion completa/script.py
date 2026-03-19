@@ -11,6 +11,79 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
     pt = rx.dot(rz2.dot(rz1.dot([x, y, z])))
     return np.array([pt[0], pt[1], 0]), pt[2]
 
+
+class Scene0_Intro(Scene):
+    def construct(self):
+        logo = VGroup()
+        hex_out = RegularPolygon(n=6, start_angle=PI/2, color=WHITE).set_stroke(width=12)
+        
+        v0 = np.array([0, 0.85, 0])
+        v_tl = np.array([-np.sqrt(3)/2 * 0.85, 0.5 * 0.85, 0])
+        v_bl = np.array([-np.sqrt(3)/2 * 0.85, -0.5 * 0.85, 0])
+        v_b = np.array([-0.3, -0.85, 0])
+        left_poly = Polygon(v0, v_tl, v_bl, v_b, color=WHITE, stroke_width=0).set_fill(WHITE, 1)
+        
+        right_leg = Line(v0, np.array([0.5, -0.85, 0]), color=WHITE, stroke_width=12)
+        logo.add(hex_out, left_poly, right_leg)
+        logo.scale(0.8)
+        
+        kyma_text = VGroup(*[Text(char, font_size=120, weight=BOLD) for char in "KYMA"])
+        kyma_text.arrange(RIGHT, buff=0.2)
+        
+        full_logo = VGroup(logo, kyma_text).arrange(RIGHT, buff=1.0)
+        full_logo.move_to(ORIGIN).shift(UP*1.0)
+        
+        self.play(
+            Create(hex_out),
+            FadeIn(left_poly, shift=RIGHT),
+            Create(right_leg),
+            run_time=1.0
+        )
+        
+        self.play(
+            LaggedStart(
+                *[FadeIn(letter, shift=LEFT*0.8, scale=3) for letter in kyma_text],
+                lag_ratio=0.15,
+                run_time=0.8,
+                rate_func=rate_functions.ease_out_bounce
+            )
+        )
+        self.wait(0.5)
+        
+        words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
+        slot_texts = VGroup(*[Text(w, font_size=80, color=BLUE_C, weight=BOLD) for w in words])
+        
+        for t in slot_texts:
+            t.next_to(kyma_text, DOWN, buff=0.8).align_to(kyma_text, LEFT)
+            
+        current_text = slot_texts[0]
+        self.play(FadeIn(current_text, shift=DOWN*0.6), run_time=0.3)
+        
+        for next_text in slot_texts[1:-1]:
+            self.play(
+                FadeOut(current_text, shift=DOWN*0.6),
+                FadeIn(next_text, shift=DOWN*0.6),
+                run_time=0.12
+            )
+            current_text = next_text
+            
+        piezo_txt = slot_texts[-1]
+        self.play(
+            FadeOut(current_text, shift=DOWN*1.2),
+            FadeIn(piezo_txt, shift=DOWN*1.2),
+            run_time=0.8,
+            rate_func=rate_functions.ease_out_elastic
+        )
+        
+        self.play(
+            piezo_txt.animate.set_color(YELLOW).scale(1.2), 
+            run_time=0.5, 
+            rate_func=there_and_back
+        )
+        self.wait(2)
+        self.play(FadeOut(Group(*self.mobjects)))
+
+
 class PerovskiteCell(VGroup):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
