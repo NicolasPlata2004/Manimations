@@ -25,7 +25,7 @@ class MicroscopyScene(Scene):
             return polys
 
         # Part 1: Large Grains
-        large_grains = create_grain_cluster(scale_factor=1.5).shift(LEFT*3 + DOWN*0.5)
+        large_grains = create_grain_cluster(scale_factor=1.4).shift(LEFT*3 + DOWN*1.2)
         
         domains = VGroup()
         for poly in large_grains:
@@ -40,7 +40,7 @@ class MicroscopyScene(Scene):
         text_large = VGroup(
             Text("Granos Grandes (> 1 μm)", font_size=24),
             Text("Fuertes dominios piezoeléctricos", font_size=24, color=YELLOW)
-        ).arrange(DOWN, aligned_edge=LEFT).next_to(large_grains, UP, buff=0.5).shift(DOWN*0.3)
+        ).arrange(DOWN, aligned_edge=LEFT).next_to(large_grains, UP, buff=0.6)
 
         self.play(FadeIn(large_grains))
         self.play(Create(domains), run_time=1.5)
@@ -52,7 +52,7 @@ class MicroscopyScene(Scene):
         for dx in np.linspace(-1, 2, 4):
             for dy in np.linspace(-1.5, 1.5, 4):
                 cluster = create_grain_cluster(scale_factor=0.25)
-                cluster.move_to(RIGHT*(dx*1.0 + 3.5) + UP*(dy*1.0 - 1.0))
+                cluster.move_to(RIGHT*(dx*1.0 + 3.5) + UP*(dy*1.0 - 1.5))
                 c_val = np.random.random() * 0.3 + 0.2
                 cluster.set_fill(color=rgb_to_color((c_val, c_val, c_val)))
                 small_grains_group.add(cluster)
@@ -60,7 +60,7 @@ class MicroscopyScene(Scene):
         text_small = VGroup(
             Text("Efecto de Tamaño: Granos < 100 nm", font_size=24),
             Text("En este caso se pierde la\npropiedad piezoeléctrica", font_size=24, color=RED)
-        ).arrange(DOWN, aligned_edge=LEFT).next_to(small_grains_group, UP, buff=0.5).shift(UP*0.5)
+        ).arrange(DOWN, aligned_edge=LEFT).next_to(small_grains_group, UP, buff=0.6)
 
         self.play(FadeIn(small_grains_group))
         
@@ -149,16 +149,16 @@ class XRDPhaseScene(Scene):
 
         axes = Axes(
             x_range=[44, 46, 0.5], 
-            y_range=[0, 1.5, 0.5], 
-            x_length=4.5, 
-            y_length=4, 
+            y_range=[0, 1.6, 0.5], 
+            x_length=4.0, 
+            y_length=3.3, 
             axis_config={"color": WHITE, "include_numbers":True}, 
             tips=False
         )
-        axes.to_edge(LEFT, buff=0.5).shift(DOWN*0.5)
+        axes.to_edge(LEFT, buff=0.8).shift(DOWN*0.8)
         
-        y_label = Text("Intensidad", font_size=20).rotate(PI/2).next_to(axes.y_axis, LEFT, buff=0.2)
-        x_label = Text("2-Theta", font_size=20).next_to(axes.x_axis, DOWN, buff=0.2)
+        y_label = Text("Intensidad", font_size=18).rotate(PI/2).next_to(axes.y_axis, LEFT, buff=0.2)
+        x_label = Text("2-Theta", font_size=18).next_to(axes.x_axis, DOWN, buff=0.2)
         self.add(axes, x_label, y_label)
 
         t_tracker = ValueTracker(0)
@@ -171,7 +171,7 @@ class XRDPhaseScene(Scene):
             sig = 0.06 + 0.02*t
             p1 = amp1 * np.exp(-0.5 * ((x - mu1) / sig)**2)
             p2 = amp2 * np.exp(-0.5 * ((x - mu2) / sig)**2)
-            p_cubic = (1-t) * 1.1 * np.exp(-0.5 * ((x - 45.15) / sig)**2)
+            p_cubic = (1-t) * 1.0 * np.exp(-0.5 * ((x - 45.15) / sig)**2)
             return p1 + p2 + p_cubic
             
         curve = always_redraw(lambda: axes.plot(lambda x: xrd_profile(x, t_tracker.get_value()), color=YELLOW))
@@ -189,8 +189,8 @@ class XRDPhaseScene(Scene):
 
         phase_lbl = always_redraw(lambda: Text(
             "Tetragonal (Piezoeléctrico)" if t_tracker.get_value() > 0.5 else "Cúbico (No piezoeléctrico)",
-            font_size=24, color=RED if t_tracker.get_value() > 0.5 else BLUE
-        ).move_to(axes.c2p(45, 1.45)))
+            font_size=22, color=RED if t_tracker.get_value() > 0.5 else BLUE
+        ).next_to(axes, UP, buff=0.4).align_to(axes, LEFT))
 
         self.add(peak_002_line, peak_200_line, lbl_002, lbl_200, phase_lbl)
 
@@ -217,11 +217,11 @@ class PhaseTransitionsScene(Scene):
         title_line = Line(title.get_left(), title.get_right(), color=BLUE).next_to(title, DOWN, buff=0.1)
         self.add(title, title_line)
 
-        axes = Axes(x_range=[20, 160, 20], y_range=[0, 10000, 2000], x_length=4.5, y_length=4, axis_config={"color": WHITE, "include_numbers":True}, tips=False)
-        axes.to_edge(LEFT, buff=0.5).shift(DOWN*0.5)
+        axes = Axes(x_range=[20, 160, 20], y_range=[0, 10000, 2000], x_length=4.0, y_length=3.3, axis_config={"color": WHITE, "include_numbers":True}, tips=False)
+        axes.to_edge(LEFT, buff=0.8).shift(DOWN*0.5)
 
-        x_label = Text("Temperatura (°C)", font_size=20).next_to(axes.x_axis, DOWN, buff=0.3)
-        y_label = Text("Permitividad (ε')", font_size=20).rotate(PI/2).next_to(axes.y_axis, LEFT, buff=0.2)
+        x_label = Text("Temperatura (°C)", font_size=18).next_to(axes.x_axis, DOWN, buff=0.3)
+        y_label = Text("Permitividad (ε')", font_size=18).rotate(PI/2).next_to(axes.y_axis, LEFT, buff=0.2)
         self.add(axes, x_label, y_label)
 
         def permittivity(T):
@@ -259,7 +259,7 @@ class PhaseTransitionsScene(Scene):
         alert = VGroup(
             Text("Transición a fase cúbica:", font_size=24, color=RED),
             Text("Pérdida de piezoelectricidad", font_size=24)
-        ).arrange(DOWN, aligned_edge=LEFT).next_to(axes, UP, buff=0.2).align_to(axes, LEFT)
+        ).arrange(DOWN, aligned_edge=LEFT).next_to(axes, UP, buff=0.4).align_to(axes, LEFT)
 
         self.add(alert)
         self.play(Flash(dot, color=RED, line_length=0.4, num_lines=12, flash_radius=0.4))
