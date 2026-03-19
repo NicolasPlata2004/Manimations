@@ -92,14 +92,18 @@ class PerovskiteCell(VGroup):
                 mob.set_z_index(100)
                 
             p = [project_iso(*c, rot_z_deg=rot_angle)[0] for c in corners]
-            self.dim_a_line.put_start_and_end_on(p[1] + offset, p[5] + offset)
-            self.lbl_a.move_to((p[1]+p[5])/2 + offset + DOWN*0.3)
             
-            self.dim_b_line.put_start_and_end_on(p[5] + offset, p[6] + offset)
-            self.lbl_b.move_to((p[5]+p[6])/2 + offset + RIGHT*0.3)
+            a_off = DOWN*0.6 + RIGHT*0.2
+            self.dim_a_line.put_start_and_end_on(p[1] + offset + a_off, p[5] + offset + a_off)
+            self.lbl_a.move_to((p[1]+p[5])/2 + offset + a_off + DOWN*0.3)
             
-            self.dim_c_line.put_start_and_end_on(p[4] + offset, p[7] + offset)
-            self.lbl_c.move_to((p[4]+p[7])/2 + offset + LEFT*0.3)
+            b_off = UP*0.4 + RIGHT*0.4
+            self.dim_b_line.put_start_and_end_on(p[5] + offset + b_off, p[6] + offset + b_off)
+            self.lbl_b.move_to((p[5]+p[6])/2 + offset + b_off + RIGHT*0.3)
+            
+            c_off = LEFT*0.6
+            self.dim_c_line.put_start_and_end_on(p[4] + offset + c_off, p[7] + offset + c_off)
+            self.lbl_c.move_to((p[4]+p[7])/2 + offset + c_off + LEFT*0.3)
         else:
             for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c]:
                 mob.set_opacity(0)
@@ -218,20 +222,20 @@ class Scene1_UnitCell(Scene):
         cube1.ti_atom.set_opacity(0)
         cube1.show_angles = True
         cube1.show_dimensions = False
-        cube1.scale(1.2).shift(LEFT*2.5 + DOWN*0.5)
-        lbl_cube1 = Tex("Ángulos Inter-axiales", font_size=24).move_to(LEFT*2.5 + DOWN*3.1)
+        cube1.scale(1.2).shift(LEFT*1.5 + DOWN*0.5)
+        lbl_cube1 = Tex("Ángulos Inter-axiales", font_size=24).move_to(LEFT*1.5 + DOWN*3.1)
         
         cube2 = PerovskiteCell()
         cube2.show_angles = False
         cube2.show_dimensions = True
-        cube2.scale(1.2).shift(RIGHT*2.5 + DOWN*0.5)
-        lbl_cube2 = Tex("Parámetros de Red", font_size=24).move_to(RIGHT*2.5 + DOWN*3.1)
+        cube2.scale(1.2).shift(RIGHT*3.5 + DOWN*0.5)
+        lbl_cube2 = Tex("Parámetros de Red", font_size=24).move_to(RIGHT*3.5 + DOWN*3.1)
         
         txt_subtitle = MathTex(r"a = b = c", font_size=32, color=RED).next_to(txt_sym, DOWN, buff=0.2)
         
         # Pre-tick updaters manually to set geometries physically before the FadeIn targets their states
-        cube1.update_cell(0, angle_tracker.get_value(), LEFT*2.5 + DOWN*0.5)
-        cube2.update_cell(0, angle_tracker.get_value(), RIGHT*2.5 + DOWN*0.5)
+        cube1.update_cell(0, angle_tracker.get_value(), LEFT*1.5 + DOWN*0.5)
+        cube2.update_cell(0, angle_tracker.get_value(), RIGHT*3.5 + DOWN*0.5)
         
         cell.clear_updaters()
         self.play(
@@ -243,8 +247,8 @@ class Scene1_UnitCell(Scene):
             Write(txt_subtitle)
         )
         
-        cube1.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), LEFT*2.5 + DOWN*0.5))
-        cube2.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), RIGHT*2.5 + DOWN*0.5))
+        cube1.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), LEFT*1.5 + DOWN*0.5))
+        cube2.add_updater(lambda m, dt: m.update_cell(0, angle_tracker.get_value(), RIGHT*3.5 + DOWN*0.5))
         
         self.play(angle_tracker.animate.increment_value(90), run_time=6, rate_func=smooth)
         self.wait(4)
