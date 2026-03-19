@@ -19,25 +19,33 @@ class PerovskiteCell(VGroup):
         self.ti_atom = Dot(radius=0.12, color=YELLOW)
         self.edges = [Line(ORIGIN, UP, color=WHITE, stroke_width=2) for _ in range(12)]
         
-        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
-        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
-        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2)
-        self.lbl_a = MathTex("a", font_size=24, color=WHITE)
-        self.lbl_b = MathTex("b", font_size=24, color=WHITE)
-        self.lbl_c = MathTex("c", font_size=24, color=WHITE)
+        self.dim_a_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_b_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.dim_c_line = Line(ORIGIN, UP, color=WHITE, stroke_width=2).set_opacity(0)
+        self.lbl_a = MathTex("a", font_size=24, color=WHITE).set_opacity(0)
+        self.lbl_b = MathTex("b", font_size=24, color=WHITE).set_opacity(0)
+        self.lbl_c = MathTex("c", font_size=24, color=WHITE).set_opacity(0)
         
-        self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE)
-        self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE)
-        self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE)
+        self.lbl_alpha = MathTex(r"\alpha=90^\circ", font_size=16, color=WHITE).set_opacity(0)
+        self.lbl_beta = MathTex(r"\beta=90^\circ", font_size=16, color=WHITE).set_opacity(0)
+        self.lbl_gamma = MathTex(r"\gamma=90^\circ", font_size=16, color=WHITE).set_opacity(0)
         
-        self.miller_002 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=BLUE, fill_opacity=0.4, stroke_width=0)
-        self.miller_200 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=RED, fill_opacity=0.4, stroke_width=0)
-        self.d002_arrow = DoubleArrow(ORIGIN, UP, color=BLUE, buff=0, max_tip_length_to_length_ratio=0.1)
-        self.d200_arrow = DoubleArrow(ORIGIN, UP, color=RED, buff=0, max_tip_length_to_length_ratio=0.1)
-        self.lbl_d002 = MathTex(r"d_{002}", font_size=20, color=BLUE)
-        self.lbl_d200 = MathTex(r"d_{200}", font_size=20, color=RED)
+        self.miller_002 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=BLUE, stroke_width=0).set_fill(BLUE, 0)
+        self.miller_200 = Polygon(ORIGIN, UP, RIGHT, DOWN, color=RED, stroke_width=0).set_fill(RED, 0)
+        self.d002_arrow = DoubleArrow(ORIGIN, UP, color=BLUE, buff=0, max_tip_length_to_length_ratio=0.1).set_opacity(0)
+        self.d200_arrow = DoubleArrow(ORIGIN, UP, color=RED, buff=0, max_tip_length_to_length_ratio=0.1).set_opacity(0)
+        self.lbl_d002 = MathTex(r"d_{002}", font_size=20, color=BLUE).set_opacity(0)
+        self.lbl_d200 = MathTex(r"d_{200}", font_size=20, color=RED).set_opacity(0)
 
-        self.add(*self.edges, *self.ba_atoms, *self.o_atoms, self.ti_atom)
+        # Add EVERYTHING statically. Never modify self.submobjects again!
+        self.add(
+            self.miller_002, self.miller_200, 
+            *self.edges, *self.ba_atoms, *self.o_atoms, self.ti_atom,
+            self.dim_a_line, self.dim_b_line, self.dim_c_line,
+            self.lbl_a, self.lbl_b, self.lbl_c,
+            self.lbl_alpha, self.lbl_beta, self.lbl_gamma,
+            self.d002_arrow, self.d200_arrow, self.lbl_d002, self.lbl_d200
+        )
         self.show_dimensions = False
         self.show_miller = False
 
@@ -57,11 +65,10 @@ class PerovskiteCell(VGroup):
         ]
         ti_coord = [0, 0, 0.4 * t_val]
         
-        z_map = {}
         def set_pos(mob, coord):
             pt, z = project_iso(*coord, rot_z_deg=rot_angle)
             mob.move_to(pt + offset)
-            z_map[mob] = z
+            mob.set_z_index(z)
             return pt + offset
             
         points_corners = [set_pos(self.ba_atoms[i], corners[i]) for i in range(8)]
@@ -71,14 +78,16 @@ class PerovskiteCell(VGroup):
         edge_pairs = [(0,1), (1,2), (2,3), (3,0), (4,5), (5,6), (6,7), (7,4), (0,4), (1,5), (2,6), (3,7)]
         for i, (i1, i2) in enumerate(edge_pairs):
             self.edges[i].put_start_and_end_on(points_corners[i1], points_corners[i2])
-            z_map[self.edges[i]] = (z_map[self.ba_atoms[i1]] + z_map[self.ba_atoms[i2]]) / 2
+            avg_z = (self.ba_atoms[i1].z_index + self.ba_atoms[i2].z_index) / 2.0
+            self.edges[i].set_z_index(avg_z)
             
-        sortable = self.edges + self.ba_atoms + self.o_atoms + [self.ti_atom]
-        extras = []
-        
+        # Toggles behavior using purely opacity to preserve geometry indices safely
         if self.show_dimensions:
+            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
+                mob.set_opacity(1)
+                mob.set_z_index(100)
+                
             p = [project_iso(*c, rot_z_deg=rot_angle)[0] for c in corners]
-            
             self.dim_a_line.put_start_and_end_on(p[0] + offset, p[1] + offset)
             self.lbl_a.move_to((p[0]+p[1])/2 + offset + DOWN*0.3)
             
@@ -91,20 +100,25 @@ class PerovskiteCell(VGroup):
             self.lbl_gamma.move_to(p[1] + offset + (p[0]-p[1])*0.3 + (p[2]-p[1])*0.3)
             self.lbl_beta.move_to(p[0] + offset + (p[1]-p[0])*0.3 + (p[4]-p[0])*0.3)
             self.lbl_alpha.move_to(p[4] + offset + (p[0]-p[4])*0.3 + (p[5]-p[4])*0.3)
-            
-            extras.extend([self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_gamma, self.lbl_beta, self.lbl_alpha])
-            
+        else:
+            for mob in [self.dim_a_line, self.dim_b_line, self.dim_c_line, self.lbl_a, self.lbl_b, self.lbl_c, self.lbl_alpha, self.lbl_beta, self.lbl_gamma]:
+                mob.set_opacity(0)
+                
         if self.show_miller:
+            self.miller_002.set_fill(BLUE, 0.4)
+            self.miller_200.set_fill(RED, 0.4)
+            for mob in [self.d002_arrow, self.d200_arrow, self.lbl_d002, self.lbl_d200]: mob.set_opacity(1).set_z_index(100)
+            
             m002_corn = [[-a/2, -b/2, 0], [a/2, -b/2, 0], [a/2, b/2, 0], [-a/2, b/2, 0]]
             m200_corn = [[0, -b/2, -c/2], [0, b/2, -c/2], [0, b/2, c/2], [0, -b/2, c/2]]
             
-            pts_002 = [project_iso(*p, rot_z_deg=rot_angle)[0] + offset for p in m002_corn]
-            pts_200 = [project_iso(*p, rot_z_deg=rot_angle)[0] + offset for p in m200_corn]
+            pts_002 = [project_iso(*pt, rot_z_deg=rot_angle)[0] + offset for pt in m002_corn]
+            pts_200 = [project_iso(*pt, rot_z_deg=rot_angle)[0] + offset for pt in m200_corn]
             
-            self.miller_002.set_points_as_corners(pts_002).set_color(BLUE).set_fill(BLUE, 0.4)
-            self.miller_200.set_points_as_corners(pts_200).set_color(RED).set_fill(RED, 0.4)
-            z_map[self.miller_002] = 0 
-            z_map[self.miller_200] = 0
+            self.miller_002.set_points_as_corners(pts_002)
+            self.miller_200.set_points_as_corners(pts_200)
+            self.miller_002.set_z_index(-10) # Draw planes behind
+            self.miller_200.set_z_index(-10)
             
             p_center = project_iso(0,0,0, rot_z_deg=rot_angle)[0] + offset
             p_top = project_iso(0,0,c/2, rot_z_deg=rot_angle)[0] + offset
@@ -114,11 +128,10 @@ class PerovskiteCell(VGroup):
             self.d200_arrow.put_start_and_end_on(p_center, p_right)
             self.lbl_d002.next_to(self.d002_arrow, RIGHT, buff=0.1)
             self.lbl_d200.next_to(self.d200_arrow, UP, buff=0.1)
-            
-            extras.extend([self.miller_002, self.miller_200, self.d002_arrow, self.d200_arrow, self.lbl_d002, self.lbl_d200])
-
-        sortable.sort(key=lambda m: z_map.get(m, 0), reverse=True) 
-        self.submobjects = sortable + extras
+        else:
+            self.miller_002.set_fill(BLUE, 0)
+            self.miller_200.set_fill(RED, 0)
+            for mob in [self.d002_arrow, self.d200_arrow, self.lbl_d002, self.lbl_d200]: mob.set_opacity(0)
 
 
 class Scene1_UnitCell(Scene):
