@@ -15,12 +15,15 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
 
 class Scene0_Intro(Scene):
     def construct(self):
+        # Configura el color de fondo específico para esta escena
+        self.camera.background_color = "#041C30"
+        
         # Ruta absoluta al archivo del logo de la empresa KYMA
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)  # Crea el objeto de imagen con altura predefinida
         
-        # Texto principal con tipografía Sans-Serif y negrita usando LaTeX
-        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}", font_size=110, color=WHITE)
+        # Texto principal con tipografía personalizada para KYMA (Lexend)
+        kyma_text = Text("KYMA", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)  # Agrupa logo y texto horizontalmente
         full_logo.move_to(UP*1.0)  # Posiciona el grupo en la parte superior
         
@@ -30,7 +33,7 @@ class Scene0_Intro(Scene):
         
         # Lista de nombres de proyectos para el efecto de "slot machine" (tragamonedas)
         words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
-        slot_texts = VGroup(*[Text(w, font_size=75, color=BLUE, weight=BOLD) for w in words])
+        slot_texts = VGroup(*[Text(w, font="Lato", font_size=75, color=BLUE, weight=BOLD) for w in words])
         
         for t in slot_texts:
             # Alinea cada palabra debajo del texto de KYMA
