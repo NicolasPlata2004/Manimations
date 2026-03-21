@@ -15,8 +15,12 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
 
 class Scene0_Intro(Scene):
     def construct(self):
-        # Configura el color de fondo específico para esta escena
-        self.camera.background_color = "#041C30"
+        # Configura la imagen de fondo específica para esta escena
+        bg_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Fondo Kyma.png"
+        bg_image = ImageMobject(bg_path).scale_to_fit_width(config.frame_width)
+        # Aseguramos que el fondo se quede en la capa más profunda y lo añadimos primero
+        bg_image.z_index = -100
+        self.add(bg_image)
         
         # 1. CREACIÓN DE ELEMENTOS VISUALES
         # Ruta absoluta al archivo del logo de la empresa KYMA
@@ -41,7 +45,7 @@ class Scene0_Intro(Scene):
         escena_completa = Group(full_logo, slot_texts)
         escena_completa.move_to(ORIGIN)  # Bien, bien centrado
         # Escala: 0.7 significa escalarlo a un 70% de su tamaño. Puedes modificar este valor libremente.
-        escena_completa.scale(0.7) 
+        escena_completa.scale(0.6) 
         
         # 3. ANIMACIONES Y CURVAS DE BÉZIER
         # Implementación de curvas de Bézier controlables.
@@ -60,7 +64,7 @@ class Scene0_Intro(Scene):
         kyma_text_virgen = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
         # IMPORTANTE: Aplicar la misma escala (0.7) que le pusimos a todo el grupo 
         # antes de moverla y sobreescribir la original, para evitar que salga gigante.
-        kyma_text_virgen.scale(0.7).move_to(kyma_text)
+        kyma_text_virgen.scale(0.6).move_to(kyma_text)
         kyma_text.become(kyma_text_virgen)
         
         self.wait(0.5)
