@@ -15,21 +15,16 @@ def project_iso(x, y, z, phi_deg=65, theta_deg=15, rot_z_deg=0):
 
 class Scene0_Intro(Scene):
     def construct(self):
-        # Configura la imagen de fondo específica para esta escena
-        bg_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Fondo Kyma.png"
-        bg_image = ImageMobject(bg_path).scale_to_fit_width(config.frame_width)
-        # Aseguramos que el fondo se quede en la capa más profunda y lo añadimos primero
-        bg_image.z_index = -100
-        self.add(bg_image)
+        # Regresamos al fondo negro clásico como en la imagen de referencia
+        self.camera.background_color = BLACK
         
         # 1. CREACIÓN DE ELEMENTOS VISUALES
         # Ruta absoluta al archivo del logo de la empresa KYMA
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Usamos Text con una fuente sans-serif estándar (como Arial o Helvetica) 
-        # para que el motor de Cairo lo rinda en blanco puro sin los glitches de LaTeX.
-        kyma_text = Text("K Y M A", font="Arial", font_size=90, weight=BOLD, color=WHITE)
+        # Texto principal con tipografía Sans-Serif y negrita usando LaTeX (estado original estable)
+        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}", font_size=110, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
