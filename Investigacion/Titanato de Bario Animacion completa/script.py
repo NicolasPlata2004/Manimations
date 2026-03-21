@@ -42,7 +42,7 @@ class Scene0_Intro(Scene):
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
         words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
-        slot_texts = Group(*[Text(w, font="Lato", font_size=75, color=BLUE, weight=BOLD) for w in words])
+        slot_texts = Group(*[Text(w, font="Lato", font_size=60, color=BLUE, weight=BOLD) for w in words])
         
         # Alineamos el texto del carrusel justo debajo de la Y de KYMA
         for t in slot_texts:
@@ -60,7 +60,9 @@ class Scene0_Intro(Scene):
         # Los corchetes son los 4 puntos de control [P0, P1, P2, P3] (entre 0 y 1).
         curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
         
-        self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
+        # Hacemos que el logo haga FadeIn exactamente desde el centro de toda la pantalla (ORIGIN) 
+        # hacia su posición real a la izquierda al usar get_center() como su propio vector de desplazamiento.
+        self.play(FadeIn(logo, shift=logo.get_center()), run_time=1.5, rate_func=curva_bezier_entrada)
         
         # Animación Write() original para el texto LaTeX
         # MUY IMPORTANTE: Retiramos `rate_func=curva_bezier_entrada` de este Write()
