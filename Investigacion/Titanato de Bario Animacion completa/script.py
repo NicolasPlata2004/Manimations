@@ -23,10 +23,8 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # El glifo "K" en Lexend tiene trazos geométricos que se solapan internamente. 
-        # Manim por defecto recorta las superposiciones y hace que el fondo azul oscuro/gris se filtre.
-        # Al añadir un borde (stroke) blanco de grosor 2, "tapamos" esos huecos matemáticos.
-        kyma_text = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD).set_fill(WHITE, opacity=1).set_stroke(WHITE, width=2)
+        # Volvemos a generar el texto limpio con Lexend
+        kyma_text = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
@@ -52,7 +50,10 @@ class Scene0_Intro(Scene):
         curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
         
         self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
-        self.play(Write(kyma_text), run_time=1.0, rate_func=curva_bezier_entrada)
+        # Reemplazamos Write() por un FadeIn secuencial con lag_ratio.
+        # "Write()" desarma matemáticamente el vector en trazos temporales y colapsa la "K" dejándola gris.
+        # Este FadeIn preserva intacto el texto blanco brillante original desde Pango/Cairo.
+        self.play(FadeIn(kyma_text, shift=DOWN*0.1, lag_ratio=0.15), run_time=1.0, rate_func=curva_bezier_entrada)
         self.wait(0.5)
         
         current_text = slot_texts[0]
