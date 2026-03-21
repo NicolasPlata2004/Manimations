@@ -50,10 +50,16 @@ class Scene0_Intro(Scene):
         curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
         
         self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
-        # Reemplazamos Write() por un FadeIn secuencial con lag_ratio.
-        # "Write()" desarma matemáticamente el vector en trazos temporales y colapsa la "K" dejándola gris.
-        # Este FadeIn preserva intacto el texto blanco brillante original desde Pango/Cairo.
-        self.play(FadeIn(kyma_text, shift=DOWN*0.1, lag_ratio=0.15), run_time=1.0, rate_func=curva_bezier_entrada)
+        
+        # El usuario prefiere la animación Write(). Como el Write() rompe matemáticamente la "K" 
+        # y no la rellena de blanco al final, dejamos correr la animación normalmente...
+        self.play(Write(kyma_text), run_time=1.0, rate_func=curva_bezier_entrada)
+        
+        # ...y en cuanto termina, inmediatamente forzamos al objeto a adoptar las físicas de un 
+        # renderizado virgen sin fallos mediante .become(), para que la K no se quede de color gris.
+        kyma_text_virgen = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE).move_to(kyma_text)
+        kyma_text.become(kyma_text_virgen)
+        
         self.wait(0.5)
         
         current_text = slot_texts[0]
