@@ -22,8 +22,8 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)  # Crea el objeto de imagen con altura predefinida
         
-        # Texto principal con tipografía personalizada para KYMA (Lexend)
-        kyma_text = Text("KYMA", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
+        # Texto principal con tipografía Sans-Serif y negrita usando LaTeX (estilo anterior solicitado)
+        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}",font="Lexend", font_size=110, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)  # Agrupa logo y texto horizontalmente
         full_logo.move_to(UP*1.0)  # Posiciona el grupo en la parte superior
         
