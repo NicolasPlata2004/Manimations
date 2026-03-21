@@ -23,30 +23,40 @@ class Scene0_Intro(Scene):
         self.add(bg_image)
         
         # 1. CREACIÓN DE ELEMENTOS VISUALES
-        # Ruta absoluta al archivo vectorial integral del logo + texto KYMA
-        svg_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\kyma (1).svg"
-        # Usamos SVGMobject para leer los vectores nativos y permitir animación Write perfecta
-        full_logo = SVGMobject(svg_path).set_width(10).set_color(WHITE)
+        # Ruta absoluta al archivo del logo de la empresa KYMA
+        logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
+        logo = ImageMobject(logo_path).set_height(2.5)
+        
+        # Usamos Text con una fuente sans-serif estándar (como Arial o Helvetica) 
+        # para que el motor de Cairo lo rinda en blanco puro sin los glitches de LaTeX.
+        kyma_text = Text("K Y M A", font="Arial", font_size=90, weight=BOLD, color=WHITE)
+        full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
         words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
         slot_texts = Group(*[Text(w, font="Lato", font_size=75, color=BLUE, weight=BOLD) for w in words])
         
-        # Alineamos el texto del carrusel debajo de la parte derecha del SVG (sección del texto)
+        # Alineamos el texto del carrusel justo debajo de la Y de KYMA
         for t in slot_texts:
-            t.next_to(full_logo, DOWN, buff=0.8).align_to(full_logo, RIGHT)
-            t.shift(LEFT*0.8)  # Ajuste manual para centrar estéticamente bajo el espacio de la YMA
+            # Reducimos el buff a 0.35 para acercarlo un poquito a la palabra principal
+            t.next_to(kyma_text, DOWN, buff=0.35).align_to(kyma_text, LEFT)
             
         # 2. ESCALADO Y CENTRADO GLOBAL
+        # Agrupamos absolutamente todo (logo y carrusel) para poder escalarlo y centrarlo
         escena_completa = Group(full_logo, slot_texts)
         escena_completa.move_to(ORIGIN)  # Bien, bien centrado
+        # Escala: 0.6 para que se vea bien con el fondo
         escena_completa.scale(0.6) 
         
         # 3. ANIMACIONES Y CURVAS DE BÉZIER
+        # Los corchetes son los 4 puntos de control [P0, P1, P2, P3] (entre 0 y 1).
         curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
         
-        # Animación de escritura unificada: Manim dibujará los trazos del isotipo y las letras del SVG.
-        self.play(Write(full_logo), run_time=2.5, rate_func=curva_bezier_entrada)
+        self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
+        
+        # Animación Write() original para el texto LaTeX
+        self.play(Write(kyma_text), run_time=1.0, rate_func=curva_bezier_entrada)
+        
         self.wait(0.5)
         
         current_text = slot_texts[0]
