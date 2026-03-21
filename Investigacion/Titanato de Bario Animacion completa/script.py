@@ -55,7 +55,10 @@ class Scene0_Intro(Scene):
         self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
         
         # Animación Write() original para el texto LaTeX
-        self.play(Write(kyma_text), run_time=1.0, rate_func=curva_bezier_entrada)
+        # MUY IMPORTANTE: Retiramos `rate_func=curva_bezier_entrada` de este Write()
+        # porque la aceleración de Bézier causa que Manim se salte los frames intermedios de relleno 
+        # para el primer glifo de los Textos LaTeX, dejando la "K" gris perpetuamente.
+        self.play(Write(kyma_text), run_time=1.0)
         
         self.wait(0.5)
         
