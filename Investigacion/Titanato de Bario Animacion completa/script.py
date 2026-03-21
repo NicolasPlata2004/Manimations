@@ -23,9 +23,9 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Usamos Text nativo para permitir la fuente Lexend sin romper el compilador LaTeX.
-        # "K Y M A" con espacios como lo solicitaste.
-        kyma_text = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
+        # Dividimos el texto en un VGroup letra por letra para forzar el color BLANCO absoluto 
+        # y evitar el glitch de escala de grises de Cairo/Pango con ciertas tipografías.
+        kyma_text = VGroup(*[Text(char, font="Lexend", font_size=110, weight=BOLD, color=WHITE) for char in "KYMA"]).arrange(RIGHT, buff=0.25)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
