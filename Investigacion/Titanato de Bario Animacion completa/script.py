@@ -57,7 +57,10 @@ class Scene0_Intro(Scene):
         
         # ...y en cuanto termina, inmediatamente forzamos al objeto a adoptar las físicas de un 
         # renderizado virgen sin fallos mediante .become(), para que la K no se quede de color gris.
-        kyma_text_virgen = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE).move_to(kyma_text)
+        kyma_text_virgen = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
+        # IMPORTANTE: Aplicar la misma escala (0.7) que le pusimos a todo el grupo 
+        # antes de moverla y sobreescribir la original, para evitar que salga gigante.
+        kyma_text_virgen.scale(0.7).move_to(kyma_text)
         kyma_text.become(kyma_text_virgen)
         
         self.wait(0.5)
