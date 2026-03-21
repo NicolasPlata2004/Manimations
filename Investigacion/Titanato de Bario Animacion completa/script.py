@@ -17,10 +17,18 @@ class Scene0_Intro(Scene):
     def construct(self):
         # Configura la imagen de fondo específica para esta escena
         bg_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Fondo Kyma.png"
-        bg_image = ImageMobject(bg_path).scale_to_fit_width(config.frame_width)
+        
+        # Efecto PARALLAX: Escalamos el fondo un 25% más grande que la pantalla
+        # para que tenga espacio para moverse en todas las direcciones sin revelar negro.
+        bg_image = ImageMobject(bg_path).scale_to_fit_width(config.frame_width * 1.25)
         # Aseguramos que el fondo se quede en la capa más profunda y lo añadimos primero
         bg_image.z_index = -100
         self.add(bg_image)
+        
+        # Añadimos un "updater" constante que moverá la imagen matemáticamente 
+        # en cada frame de la animación sin interrumpir a los otros play().
+        # Se mueve lentamente hacia abajo izquierda simulando perspectiva 3D (Parallax).
+        bg_image.add_updater(lambda m, dt: m.shift(LEFT * 0.2 * dt + DOWN * 0.1 * dt))
         
         # 1. CREACIÓN DE ELEMENTOS VISUALES
         # Ruta absoluta al archivo del logo de la empresa KYMA
