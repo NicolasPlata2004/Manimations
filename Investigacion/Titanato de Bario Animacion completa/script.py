@@ -18,54 +18,70 @@ class Scene0_Intro(Scene):
         # Configura el color de fondo específico para esta escena
         self.camera.background_color = "#041C30"
         
+        # 1. CREACIÓN DE ELEMENTOS VISUALES
         # Ruta absoluta al archivo del logo de la empresa KYMA
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
-        logo = ImageMobject(logo_path).set_height(2.5)  # Crea el objeto de imagen con altura predefinida
+        logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Texto principal con tipografía Sans-Serif y negrita usando LaTeX (estilo anterior solicitado)
-        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}",font="Lexend", font_size=110, color=WHITE)
-        full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)  # Agrupa logo y texto horizontalmente
-        full_logo.move_to(UP*1.0)  # Posiciona el grupo en la parte superior
+        # Usamos Text nativo para permitir la fuente Lexend sin romper el compilador LaTeX.
+        # "K Y M A" con espacios como lo solicitaste.
+        kyma_text = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD, color=WHITE)
+        full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
-        self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5)  # Animación de entrada del logo desde la derecha
-        self.play(Write(kyma_text), run_time=1.0)  # Animación de escritura para el nombre de la empresa
+        # Lista de nombres de proyectos para el efecto de "slot machine"
+        words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
+        slot_texts = Group(*[Text(w, font="Lato", font_size=75, color=BLUE, weight=BOLD) for w in words])
+        
+        # Alineamos el texto del carrusel justo debajo de la Y de KYMA
+        for t in slot_texts:
+            # Reducimos el buff a 0.35 para acercarlo un poquito a la palabra principal
+            t.next_to(kyma_text, DOWN, buff=0.35).align_to(kyma_text, LEFT)
+            
+        # 2. ESCALADO Y CENTRADO GLOBAL
+        # Agrupamos absolutamente todo (logo y carrusel) para poder escalarlo y centrarlo
+        escena_completa = Group(full_logo, slot_texts)
+        escena_completa.move_to(ORIGIN)  # Bien, bien centrado
+        # Escala: 0.7 significa escalarlo a un 70% de su tamaño. Puedes modificar este valor libremente.
+        escena_completa.scale(0.7) 
+        
+        # 3. ANIMACIONES Y CURVAS DE BÉZIER
+        # Implementación de curvas de Bézier controlables.
+        # Los corchetes son los 4 puntos de control [P0, P1, P2, P3] (entre 0 y 1).
+        # Modifica estos valores para cambiar la aceleración/frenado de la entrada:
+        curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
+        
+        self.play(FadeIn(logo, shift=LEFT*0.8), run_time=1.5, rate_func=curva_bezier_entrada)
+        self.play(Write(kyma_text), run_time=1.0, rate_func=curva_bezier_entrada)
         self.wait(0.5)
         
-        # Lista de nombres de proyectos para el efecto de "slot machine" (tragamonedas)
-        words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
-        slot_texts = VGroup(*[Text(w, font="Lato", font_size=75, color=BLUE, weight=BOLD) for w in words])
-        
-        for t in slot_texts:
-            # Alinea cada palabra debajo del texto de KYMA
-            t.next_to(kyma_text, DOWN, buff=0.8).align_to(kyma_text, LEFT)
-            
         current_text = slot_texts[0]
-        self.play(FadeIn(current_text, shift=DOWN*0.5), run_time=0.4)  # Muestra la primera palabra
+        self.play(FadeIn(current_text, shift=DOWN*0.5), run_time=0.4, rate_func=curva_bezier_entrada)
         
-        # Ciclo para alternar rápidamente entre los nombres de los proyectos
+        # Bucle del desfile de nombres
         for next_text in slot_texts[1:-1]:
             self.play(
                 FadeOut(current_text, shift=DOWN*0.5),
                 FadeIn(next_text, shift=DOWN*0.5),
-                run_time=0.15  # Velocidad rápida para el efecto de desfile
+                run_time=0.15
             )
             current_text = next_text
             
-        piezo_txt = slot_texts[-1]  # La palabra objetivo es "Piezo"
+        piezo_txt = slot_texts[-1]
         self.play(
             FadeOut(current_text, shift=DOWN*1.0),
             FadeIn(piezo_txt, shift=DOWN*1.0),
             run_time=0.8,
-            rate_func=rate_functions.ease_out_elastic  # Efecto de rebote elástico al frenar
+            rate_func=rate_functions.ease_out_elastic
         )
         
-        # Resalta la palabra seleccionada con color amarillo y un pulso de escala
+        # Pulso final en amarillo
         self.play(
             piezo_txt.animate.set_color(YELLOW).scale(1.2), 
             run_time=0.5, 
             rate_func=rate_functions.there_and_back
         )
-        self.wait(2)  # Pausa final de la introducción
+        self.wait(2)
+
         self.play(FadeOut(Group(*self.mobjects)))  # Limpia la pantalla para la siguiente escena
 
 
