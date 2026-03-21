@@ -23,9 +23,10 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Usamos MarkupText con una etiqueta HTML interna para forzar el color blanco
-        # y erradicar por completo el bug de color gris ("K") que ocurre con la caché de Pango.
-        kyma_text = MarkupText('<span fgcolor="white">K Y M A</span>', font="Lexend", font_size=110, weight=BOLD)
+        # El glifo "K" en Lexend tiene trazos geométricos que se solapan internamente. 
+        # Manim por defecto recorta las superposiciones y hace que el fondo azul oscuro/gris se filtre.
+        # Al añadir un borde (stroke) blanco de grosor 2, "tapamos" esos huecos matemáticos.
+        kyma_text = Text("K Y M A", font="Lexend", font_size=110, weight=BOLD).set_fill(WHITE, opacity=1).set_stroke(WHITE, width=2)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
