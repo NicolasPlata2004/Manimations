@@ -35,9 +35,9 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Texto principal con tipografía Montserrat (Moderna y Elegante)
-        # Usamos Text para cargar la fuente nativa del sistema
-        kyma_text = Text("K Y M A", font="Montserrat", font_size=90, weight=BOLD, color=WHITE)
+        # Texto principal con tipografía Lexend (Identidad Corporativa)
+        # Usamos .stretch(0.85, dim=1) para "achatar" el texto como solicitaste (más plano)
+        kyma_text = Text("K Y M A", font="Lexend", font_size=90, weight=BOLD, color=WHITE).stretch(0.85, dim=1)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
@@ -69,6 +69,12 @@ class Scene0_Intro(Scene):
         # porque la aceleración de Bézier causa que Manim se salte los frames intermedios de relleno 
         # para el primer glifo de los Textos LaTeX, dejando la "K" gris perpetuamente.
         self.play(Write(kyma_text), run_time=1.0)
+        
+        # FIX DEFINITIVO COLOR GRIS (K): Inmediatamente después del Write, 
+        # forzamos al objeto a adoptar un renderizado limpio y blanco nuclear.
+        kyma_text_fixed = Text("K Y M A", font="Lexend", font_size=90, weight=BOLD, color=WHITE).stretch(0.85, dim=1)
+        kyma_text_fixed.scale(0.6).move_to(kyma_text)
+        kyma_text.become(kyma_text_fixed)
         
         self.wait(0.5)
         
