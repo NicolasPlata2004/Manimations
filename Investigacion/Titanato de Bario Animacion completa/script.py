@@ -35,9 +35,9 @@ class Scene0_Intro(Scene):
         logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
         logo = ImageMobject(logo_path).set_height(2.5)
         
-        # Texto principal con tipografía Sans-Serif y negrita usando LaTeX 
-        # Forzamos blanco absoluto con .set_color(WHITE) DESPUÉS de la creación
-        kyma_text = Tex(r"\textbf{\textsf{K Y M A}}", font_size=110).set_color(WHITE).set_opacity(1)
+        # Texto principal con tipografía Montserrat (Moderna y Elegante)
+        # Usamos Text para cargar la fuente nativa del sistema
+        kyma_text = Text("K Y M A", font="Montserrat", font_size=90, weight=BOLD, color=WHITE)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
         # Lista de nombres de proyectos para el efecto de "slot machine"
