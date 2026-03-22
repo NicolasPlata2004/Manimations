@@ -62,7 +62,7 @@ class Scene0_Intro(Scene):
         
         # Hacemos que el logo haga FadeIn exactamente desde el centro de toda la pantalla (ORIGIN) 
         # hacia su posición real a la izquierda al usar get_center() como su propio vector de desplazamiento.
-        self.play(FadeIn(logo, shift=logo.get_center()), run_time=1.5, rate_func=curva_bezier_entrada)
+        self.play(FadeIn(logo, shift=logo.get_center()), run_time=0.9, rate_func=curva_bezier_entrada)
         
         # Animación Write() original para el texto LaTeX
         # MUY IMPORTANTE: Retiramos `rate_func=curva_bezier_entrada` de este Write()
