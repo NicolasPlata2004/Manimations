@@ -40,8 +40,17 @@ class Scene0_Intro(Scene):
         kyma_text = Text("K Y M A", font="Lexend", font_size=90, weight=BOLD, color=WHITE).stretch(0.85, dim=1)
         full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
         
-        # Lista de nombres de proyectos para el efecto de "slot machine"
-        words = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
+        # ---------------------------------------------------------
+        # CONFIGURACIÓN DEL CARRUSEL: Elige la palabra ganadora
+        # ---------------------------------------------------------
+        palabra_elegida_final = "Piezo"  # <--- CAMBIA ESTO POR "Apolo", "Simlab", etc.
+        
+        nombres_base = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
+        
+        # Automáticamente filtramos la palabra elegida y la forzamos al final de la lista
+        otros_nombres = [w for w in nombres_base if w != palabra_elegida_final]
+        words = otros_nombres + [palabra_elegida_final]
+        # ---------------------------------------------------------
         slot_texts = Group(*[Text(w, font="Lato", font_size=60, color=BLUE, weight=BOLD) for w in words])
         
         # Alineamos el texto del carrusel justo debajo de la Y de KYMA
@@ -81,8 +90,8 @@ class Scene0_Intro(Scene):
         current_text = slot_texts[0]
         self.play(FadeIn(current_text, shift=DOWN*0.5), run_time=0.4, rate_func=curva_bezier_entrada)
         
-        # Bucle del desfile de nombres
-        for next_text in slot_texts[1:-1]:
+        # Bucle del desfile de nombres (incluyendo Piezo para que tenga la misma velocidad exacta)
+        for next_text in slot_texts[1:]:
             self.play(
                 FadeOut(current_text, shift=DOWN*0.5),
                 FadeIn(next_text, shift=DOWN*0.5),
@@ -90,13 +99,8 @@ class Scene0_Intro(Scene):
             )
             current_text = next_text
             
-        piezo_txt = slot_texts[-1]
-        self.play(
-            FadeOut(current_text, shift=DOWN*1.0),
-            FadeIn(piezo_txt, shift=DOWN*1.0),
-            run_time=0.8,
-            rate_func=rate_functions.ease_out_elastic
-        )
+        piezo_txt = current_text
+        self.wait(0.3)
         
         # Pulso final en amarillo
         self.play(
@@ -600,3 +604,99 @@ class Scene5_Conclusion(Scene):
             
         self.wait(6)
         # Fin de la animación
+
+
+# ==============================================================================
+# ESCENA EXTRA: VERSIÓN VERTICAL PARA REELS/TIKTOK (Formato 9:16)
+# ==============================================================================
+# Para renderizar esta escena en formato vertical 1080x1920, debes correr en tu 
+# consola exactamente este comando:
+# python -m manim -qh -r 1080,1920 script.py Scene0_Intro_Reel
+
+class Scene0_Intro_Reel(Scene):
+    def construct(self):
+        # Configura la imagen de fondo específica para esta escena
+        bg_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Fondo Kyma.png"
+        
+        # Efecto PARALLAX: Escalamos el fondo gigantesco para que sobre espacio en vertical
+        bg_image = ImageMobject(bg_path).scale_to_fit_height(config.frame_height * 1.5)
+        # Aseguramos que el fondo se quede en la capa más profunda y lo añadimos primero
+        bg_image.z_index = -100
+        self.add(bg_image)
+        
+        # Añadimos un "updater" constante que moverá la imagen matemáticamente 
+        bg_image.add_updater(lambda m, dt: m.shift(LEFT * 0.2 * dt + DOWN * 0.1 * dt))
+        
+        # 1. CREACIÓN DE ELEMENTOS VISUALES
+        # Ruta absoluta al archivo del logo de la empresa KYMA
+        logo_path = r"C:\Users\nicao\manimations\Investigacion\Titanato de Bario Animacion completa\media\images\script\Logo_Kyma.png"
+        logo = ImageMobject(logo_path).set_height(2.5)
+        
+        # Texto principal con tipografía Lexend
+        kyma_text = Text("K Y M A", font="Lexend", font_size=90, weight=BOLD, color=WHITE).stretch(0.85, dim=1)
+        full_logo = Group(logo, kyma_text).arrange(RIGHT, buff=1.0)
+        
+        # ---------------------------------------------------------
+        # CONFIGURACIÓN DEL CARRUSEL: Elige la palabra ganadora
+        # ---------------------------------------------------------
+        palabra_elegida_final = "Piezo"  # <--- CAMBIA ESTO POR "Apolo", "Simlab", etc.
+        nombres_base = ["Apolo", "Coralink", "Ion", "JuliaRTB", "Kyno", "Kytron", "Metis", "Roky", "Simlab", "Turing", "Piezo"]
+        otros_nombres = [w for w in nombres_base if w != palabra_elegida_final]
+        words = otros_nombres + [palabra_elegida_final]
+        # ---------------------------------------------------------
+        slot_texts = Group(*[Text(w, font="Lato", font_size=60, color=BLUE, weight=BOLD) for w in words])
+        
+        # Alineamos el texto del carrusel justo debajo de la Y de KYMA
+        for t in slot_texts:
+            t.next_to(kyma_text, DOWN, buff=0.35).align_to(kyma_text, LEFT)
+            
+        # 2. ESCALADO Y CENTRADO GLOBAL
+        escena_completa = Group(full_logo, slot_texts)
+        escena_completa.move_to(ORIGIN)
+        
+        # IMPORTANTE: ESCALADO GLOBAL PARA INSTAGRAM REELS (VERTICAL)
+        # En la versión horizontal era 0.6. En un celular el ancho es muy poco (aspect ratio 9:16).
+        # Cámbialo aquí para que todo quepa en la pantalla (empieza probando 0.35 o 0.40):
+        valor_escala_general = 0.35
+        escena_completa.scale(valor_escala_general) 
+        
+        # 3. ANIMACIONES Y CURVAS DE BÉZIER
+        curva_bezier_entrada = lambda t: bezier([0, 0.2, 0.8, 1])(t) 
+        
+        # Hacemos que el logo haga FadeIn exactamente desde el centro
+        self.play(FadeIn(logo, shift=logo.get_center()), run_time=0.9, rate_func=curva_bezier_entrada)
+        
+        # Animación Write() original para el texto
+        self.play(Write(kyma_text), run_time=1.0)
+        
+        # FIX DEFINITIVO COLOR GRIS (K)
+        kyma_text_fixed = Text("K Y M A", font="Lexend", font_size=90, weight=BOLD, color=WHITE).stretch(0.85, dim=1)
+        kyma_text_fixed.scale(valor_escala_general).move_to(kyma_text)
+        kyma_text.become(kyma_text_fixed)
+        
+        self.wait(0.5)
+        
+        current_text = slot_texts[0]
+        self.play(FadeIn(current_text, shift=DOWN*0.5), run_time=0.4, rate_func=curva_bezier_entrada)
+        
+        # Bucle del desfile de nombres
+        for next_text in slot_texts[1:]:
+            self.play(
+                FadeOut(current_text, shift=DOWN*0.5),
+                FadeIn(next_text, shift=DOWN*0.5),
+                run_time=0.15
+            )
+            current_text = next_text
+            
+        piezo_txt = current_text
+        self.wait(0.3)
+        
+        # Pulso final en amarillo
+        self.play(
+            piezo_txt.animate.set_color(YELLOW).scale(1.2), 
+            run_time=0.5, 
+            rate_func=rate_functions.there_and_back
+        )
+        self.wait(2)
+
+        self.play(FadeOut(Group(*self.mobjects)))  # Limpia la pantalla para la siguiente escena
