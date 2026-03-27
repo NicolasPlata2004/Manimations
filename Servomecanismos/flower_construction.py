@@ -18,12 +18,12 @@ class ConstructionScene(Scene):
         self.wait(2)
         self.play(FadeOut(intro_text))
 
-        # --- PLANO POLAR (Expandido para Etapa 5 hasta radio 6) ---
+        # --- PLANO POLAR (Radio 6) ---
         polar_plane = PolarPlane(
             radius_max=6.0,
             radius_step=0.5,
             azimuth_step=30 * DEGREES,
-            size=8.5, # Más grande para acomodar radio 6 y etiquetas
+            size=8.5,
             background_line_style={
                 "stroke_color": GREY_C, 
                 "stroke_opacity": 0.8,
@@ -32,7 +32,6 @@ class ConstructionScene(Scene):
             azimuth_units="degrees"
         )
         
-        # Etiquetas Manuales (hasta 6.0)
         radial_labels = VGroup()
         for r_val in np.arange(0.5, 6.5, 0.5):
             lbl = MathTex(f"{r_val}", color=BLACK, font_size=18)
@@ -47,14 +46,13 @@ class ConstructionScene(Scene):
             azimuth_labels.add(lbl)
             
         polar_plane.add(radial_labels, azimuth_labels)
-        # Shift a la izquierda agresivo para dejar espacio a textos grandes
         polar_plane.shift(LEFT * 4.2).scale(0.6) 
 
-        # Posición base para los textos (Anclaje a la derecha)
+        # Posición base para los textos
         text_anchor = polar_plane.get_right() + RIGHT * 0.4 + UP * 2.5
 
         # --- ETAPA 1: r = a (Escena 1) ---
-        title1 = MathTex(r"1)\ r =", r"a", color=BLACK).to_corner(UL).scale(1.2)
+        title1 = MathTex(r"1)\ r =", r"a", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
         
         desc1 = Tex(
             r"Radio constante,\\es un simple círculo.", 
@@ -77,7 +75,7 @@ class ConstructionScene(Scene):
         self.play(FadeOut(circle_a), FadeOut(desc1), FadeOut(title1), FadeOut(val1))
 
         # --- ETAPA 2: r = cos(k * theta) (Escena 2) ---
-        title2 = MathTex(r"2)\ r =", r"\cos(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        title2 = MathTex(r"2)\ r =", r"\cos(k \cdot \theta)", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
         
         text2_1 = Tex(
             r"Al meter el ángulo dentro de un coseno, el radio\\deja de ser constante y empieza a `entrar y salir'\\del centro.",
@@ -121,8 +119,8 @@ class ConstructionScene(Scene):
         self.play(FadeOut(cos_curve), FadeOut(text2_1), FadeOut(text2_2), FadeOut(text2_3), FadeOut(title2), FadeOut(val2))
 
         # --- ETAPA 3: r = sin(k * theta) (Escena 3) ---
-        title3_cos = MathTex(r"3)\ r =", r"\cos", r"(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
-        title3_sin = MathTex(r"3)\ r =", r"\sin", r"(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        title3_cos = MathTex(r"3)\ r =", r"\cos", r"(k \cdot \theta)", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
+        title3_sin = MathTex(r"3)\ r =", r"\sin", r"(k \cdot \theta)", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
         
         text3 = Tex(
             r"Primer pétalo nace `girado'.\\Esto es porque $\sin(0)=0$. El brazo\\empieza en el centro y el primer pico\\del pétalo ocurre un poco después.",
@@ -157,7 +155,7 @@ class ConstructionScene(Scene):
         self.play(FadeOut(curve_3_cos), FadeOut(text3), FadeOut(title3_cos), FadeOut(val3))
 
         # --- ETAPA 4: r = a + sin(k * theta) (Escena 4) ---
-        title4 = MathTex(r"4)\ r =", r"a +", r"\sin(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        title4 = MathTex(r"4)\ r =", r"a +", r"\sin(k \cdot \theta)", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
         
         desc4 = Tex(
             r"Su función es ``empujar'' todos los puntos de la\\trayectoria hacia afuera del origen de forma uniforme.\\A medida que ``$a$'' aumenta, el hueco crece, pero también\\el tamaño total de la flor $r_{max} = a + b$.",
@@ -195,8 +193,7 @@ class ConstructionScene(Scene):
         self.play(FadeOut(elevated_curve), FadeOut(desc4), FadeOut(desc4_bottom), FadeOut(title4), FadeOut(val4))
 
         # --- ETAPA 5: r = a + b * sin(k * theta) (Escena 5) ---
-        # Partimos con a=3, k=3, b=0
-        title5 = MathTex(r"5)\ r =", r"a +", r"b \cdot", r"\sin(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        title5 = MathTex(r"5)\ r =", r"a +", r"b \cdot", r"\sin(k \cdot \theta)", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
         
         desc5 = Tex(
             r"Mientras que $a$ define la posición media, $b$ define la\\ \textbf{intensidad} del pétalo. Es la distancia máxima que\\el brazo se aleja de su radio base. Al aumentar $b$,\\los pétalos se vuelven más prominentes.",
@@ -209,20 +206,7 @@ class ConstructionScene(Scene):
             color=BLACK, font_size=32
         ).next_to(desc5, DOWN, buff=0.8, aligned_edge=LEFT)
 
-        b_tracker = ValueTracker(1) # Empezamos en 1 para que se vea el trébol final de la etapa 4
-        
-        def get_final_curve():
-            a = 3
-            b = b_tracker.get_value()
-            k = 3
-            return ParametricFunction(
-                lambda t: polar_plane.polar_to_point(a + b * np.sin(k * t), t),
-                t_range=[0, 2*PI],
-                color=COLOR_BLUE, stroke_width=4
-            )
-        final_curve = always_redraw(get_final_curve)
-        
-        # Monitor de variables múltiples
+        b_tracker = ValueTracker(1) 
         val5 = always_redraw(lambda: MathTex(
             rf"a = 3.00, \quad b = {b_tracker.get_value():.2f}, \quad k = 3.00", 
             color=BLACK, font_size=32
@@ -232,6 +216,16 @@ class ConstructionScene(Scene):
         self.play(Indicate(title5[2], color=COLOR_HIGHLIGHT))
         self.play(Write(desc5))
         self.play(Write(formulas5))
+        
+        final_curve = ParametricFunction(
+            lambda t: polar_plane.polar_to_point(3 + b_tracker.get_value() * np.sin(3 * t), t),
+            t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
+        )
+        final_curve.add_updater(lambda m: m.become(ParametricFunction(
+            lambda t: polar_plane.polar_to_point(3 + b_tracker.get_value() * np.sin(3 * t), t),
+            t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
+        )))
+
         self.play(Create(final_curve), Write(val5))
         self.wait(1)
         
@@ -239,6 +233,81 @@ class ConstructionScene(Scene):
             self.play(b_tracker.animate.set_value(b_val), run_time=2.5)
             self.wait(1.5)
 
+        self.wait(1)
+        self.play(FadeOut(final_curve), FadeOut(desc5), FadeOut(formulas5), FadeOut(title5), FadeOut(val5))
+
+        # --- ETAPA 6: r = a + b * sin(k * theta + d) (Escena 6) ---
+        title6 = MathTex(r"6)\ r =", r"a + b \cdot \sin(k \cdot \theta", r" + d", r")", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
+        
+        desc6 = Tex(
+            r"$d$ (radianes) añade una rotación a la flor\\ \textbf{PERO} esta rotación es:",
+            color=BLACK, font_size=32, tex_environment="center"
+        ).move_to(text_anchor, aligned_edge=LEFT)
+        
+        formula6 = MathTex(
+            r"\theta_{rot} = \frac{d}{k}",
+            color=BLACK, font_size=42
+        ).next_to(desc6, DOWN, buff=0.8).set_x(desc6.get_x()) # Centrado bajo el texto
+
+        d_tracker = ValueTracker(30 * DEGREES) 
+        
+        rotated_curve = always_redraw(lambda: ParametricFunction(
+            lambda t: polar_plane.polar_to_point(3 + 3 * np.sin(3 * t + d_tracker.get_value()), t),
+            t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
+        ))
+        val6 = always_redraw(lambda: MathTex(
+            rf"d = {d_tracker.get_value()/DEGREES:.1f}^\circ, \quad \theta_{{rot}} = {d_tracker.get_value()/(3*DEGREES):.1f}^\circ", 
+            color=BLACK, font_size=32
+        ).next_to(polar_plane, DOWN, buff=0.5))
+
+        self.play(Write(title6))
+        self.play(Indicate(title6[2], color=COLOR_HIGHLIGHT))
+        self.play(Write(desc6))
+        self.play(Write(formula6))
+        
+        self.play(Create(rotated_curve), Write(val6))
+        self.wait(1)
+        
+        self.play(d_tracker.animate.set_value(90 * DEGREES), run_time=4)
+        self.wait(2)
+
+        self.play(FadeOut(rotated_curve), FadeOut(desc6), FadeOut(formula6), FadeOut(title6), FadeOut(val6))
+
+        # --- ETAPA 7: r = a + b * sin(k * theta + k * d) (Escena 7) ---
+        title7 = MathTex(r"7)\ r =", r"a + b \cdot \sin(k \cdot \theta", r" + k \cdot d", r")", color=BLACK).to_corner(UL, buff=0.5).scale(1.2)
+        
+        desc7 = Tex(
+            r"Para que la flor gire de verdad lo que\\queremos, tenemos que compensar esa\\frecuencia multiplicando ``$d$'' por la\\misma cantidad de pétalos ``$k$''.",
+            color=BLACK, font_size=28
+        ).move_to(text_anchor, aligned_edge=LEFT)
+        
+        formula7 = MathTex(
+            r"\text{Fase} = k \cdot d",
+            color=BLACK, font_size=42
+        ).next_to(desc7, DOWN, buff=0.8).set_x(desc7.get_x())
+
+        d_comp_tracker = ValueTracker(30 * DEGREES) # d real que queremos
+        
+        comp_curve = always_redraw(lambda: ParametricFunction(
+            lambda t: polar_plane.polar_to_point(3 + 3 * np.sin(3 * t + 3 * d_comp_tracker.get_value()), t),
+            t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
+        ))
+        
+        val7 = always_redraw(lambda: MathTex(
+            rf"k \cdot d = {3 * d_comp_tracker.get_value()/DEGREES:.1f}^\circ, \quad \text{Rotación} = {d_comp_tracker.get_value()/DEGREES:.1f}^\circ", 
+            color=BLACK, font_size=32
+        ).next_to(polar_plane, DOWN, buff=0.5))
+
+        self.play(Write(title7))
+        self.play(Indicate(title7[2], color=COLOR_HIGHLIGHT))
+        self.play(Write(desc7))
+        self.play(Write(formula7))
+        
+        self.play(Create(comp_curve), Write(val7))
+        self.wait(1)
+        
+        self.play(d_comp_tracker.animate.set_value(90 * DEGREES), run_time=4)
         self.wait(3)
-        self.play(FadeOut(final_curve), FadeOut(desc5), FadeOut(formulas5), FadeOut(title5), FadeOut(val5), FadeOut(polar_plane))
+
+        self.play(FadeOut(comp_curve), FadeOut(desc7), FadeOut(formula7), FadeOut(title7), FadeOut(val7), FadeOut(polar_plane))
         self.wait(1)
