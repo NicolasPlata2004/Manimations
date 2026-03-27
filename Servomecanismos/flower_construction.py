@@ -272,7 +272,7 @@ class ConstructionScene(Scene):
             t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
         ))
         val7 = always_redraw(lambda: MathTex(
-            rf"\text{Fase} = {3 * d_comp_tracker.get_value()/DEGREES:.1f}^\circ, \quad \text{Rotación} = {d_comp_tracker.get_value()/DEGREES:.1f}^\circ", 
+            rf"\text{{Fase}} = {3 * d_comp_tracker.get_value()/DEGREES:.1f}^\circ, \quad \text{{Rotación}} = {d_comp_tracker.get_value()/DEGREES:.1f}^\circ", 
             color=BLACK, font_size=32
         ).next_to(polar_plane, DOWN, buff=0.4))
 
@@ -300,7 +300,7 @@ class ConstructionScene(Scene):
             t_range=[0, 2*PI], color=COLOR_BLUE, stroke_width=4
         ))
         val8 = always_redraw(lambda: MathTex(
-            rf"\text{Escala} = {scale_tracker.get_value():.2f}, \quad r_{{max}} = {scale_tracker.get_value()*6:.2f}", 
+            rf"\text{{Escala}} = {scale_tracker.get_value():.2f}, \quad r_{{max}} = {scale_tracker.get_value()*6:.2f}", 
             color=BLACK, font_size=32
         ).next_to(polar_plane, DOWN, buff=0.4))
 
