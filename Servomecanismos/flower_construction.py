@@ -1,8 +1,9 @@
 from manim import *
 import numpy as np
 
+# Paleta de colores
 COLOR_BLUE = "#517696"
-COLOR_HIGHLIGHT = "#D95C14" # Un naranja oscuro atractivo para los "Indicate" contra fondo blanco
+COLOR_HIGHLIGHT = "#D95C14"
 
 config.background_color = WHITE
 
@@ -17,12 +18,12 @@ class ConstructionScene(Scene):
         self.wait(2)
         self.play(FadeOut(intro_text))
 
-        # --- PLANO POLAR (Común) ---
+        # --- PLANO POLAR (Expandido para Etapa 5 hasta radio 6) ---
         polar_plane = PolarPlane(
-            radius_max=4.0,
+            radius_max=6.0,
             radius_step=0.5,
             azimuth_step=30 * DEGREES,
-            size=7.5,
+            size=8.5, # Más grande para acomodar radio 6 y etiquetas
             background_line_style={
                 "stroke_color": GREY_C, 
                 "stroke_opacity": 0.8,
@@ -31,23 +32,26 @@ class ConstructionScene(Scene):
             azimuth_units="degrees"
         )
         
+        # Etiquetas Manuales (hasta 6.0)
         radial_labels = VGroup()
-        for r_val in np.arange(0.5, 4.5, 0.5):
-            lbl = MathTex(f"{r_val}", color=BLACK, font_size=20)
+        for r_val in np.arange(0.5, 6.5, 0.5):
+            lbl = MathTex(f"{r_val}", color=BLACK, font_size=18)
             lbl.move_to(polar_plane.polar_to_point(r_val, 0) + DOWN * 0.25)
             radial_labels.add(lbl)
             
         azimuth_labels = VGroup()
         for angle_deg in range(0, 360, 30):
-            lbl = MathTex(f"{angle_deg}^\\circ", color=BLACK, font_size=24)
+            lbl = MathTex(f"{angle_deg}^\\circ", color=BLACK, font_size=20)
             angle_rad = angle_deg * DEGREES
-            lbl.move_to(polar_plane.polar_to_point(4.0 + 0.35, angle_rad))
+            lbl.move_to(polar_plane.polar_to_point(6.0 + 0.35, angle_rad))
             azimuth_labels.add(lbl)
             
         polar_plane.add(radial_labels, azimuth_labels)
-        polar_plane.shift(LEFT * 3.8).scale(0.7)
+        # Shift a la izquierda agresivo para dejar espacio a textos grandes
+        polar_plane.shift(LEFT * 4.2).scale(0.6) 
 
-        text_anchor = polar_plane.get_right() + RIGHT * 0.5 + UP * 2.5
+        # Posición base para los textos (Anclaje a la derecha)
+        text_anchor = polar_plane.get_right() + RIGHT * 0.4 + UP * 2.5
 
         # --- ETAPA 1: r = a (Escena 1) ---
         title1 = MathTex(r"1)\ r =", r"a", color=BLACK).to_corner(UL).scale(1.2)
@@ -62,7 +66,7 @@ class ConstructionScene(Scene):
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
-        val1 = MathTex("a = 1.00", color=BLACK, font_size=36).next_to(polar_plane, DOWN, buff=0.5)
+        val1 = MathTex("a = 1.00", color=BLACK, font_size=32).next_to(polar_plane, DOWN, buff=0.5)
 
         self.play(Write(title1))
         self.play(Indicate(title1[1], color=COLOR_HIGHLIGHT))
@@ -83,12 +87,12 @@ class ConstructionScene(Scene):
         text2_2 = Tex(
             r"$\bullet$ Si $k$ es entero: Determina el número de pétalos.\\Si $k$ es impar (como 7), la rosa tiene $k$ pétalos.\\Si es par, tiene $2k$.",
             color=BLACK, font_size=26
-        ).next_to(text2_1, DOWN, buff=0.5, aligned_edge=LEFT)
+        ).next_to(text2_1, DOWN, buff=0.4, aligned_edge=LEFT)
         
         text2_3 = Tex(
             r"$\bullet$ El primer pétalo nace `acostado' sobre el eje\\horizontal (Eje X). Esto es porque $\cos(0) = 1$\\(máxima extensión).",
             color=BLACK, font_size=26
-        ).next_to(text2_2, DOWN, buff=0.5, aligned_edge=LEFT)
+        ).next_to(text2_2, DOWN, buff=0.4, aligned_edge=LEFT)
 
         self.play(Write(title2))
         self.play(Indicate(title2[1], color=COLOR_HIGHLIGHT))
@@ -103,7 +107,7 @@ class ConstructionScene(Scene):
                 color=COLOR_BLUE, stroke_width=4
             )
         cos_curve = always_redraw(get_cos_curve)
-        val2 = always_redraw(lambda: MathTex(f"k = {k_tracker.get_value():.2f}", color=BLACK, font_size=36).next_to(polar_plane, DOWN, buff=0.5))
+        val2 = always_redraw(lambda: MathTex(f"k = {k_tracker.get_value():.2f}", color=BLACK, font_size=32).next_to(polar_plane, DOWN, buff=0.5))
 
         self.play(Create(cos_curve), Write(val2))
         self.wait(1)
@@ -135,7 +139,7 @@ class ConstructionScene(Scene):
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
-        val3 = MathTex("k = 3.00", color=BLACK, font_size=36).next_to(polar_plane, DOWN, buff=0.5)
+        val3 = MathTex("k = 3.00", color=BLACK, font_size=32).next_to(polar_plane, DOWN, buff=0.5)
 
         self.play(Write(title3_cos))
         self.play(Write(text3))
@@ -148,7 +152,7 @@ class ConstructionScene(Scene):
             run_time=2
         )
         self.play(Indicate(title3_cos[1], color=COLOR_HIGHLIGHT))
-        self.wait(3)
+        self.wait(2)
 
         self.play(FadeOut(curve_3_cos), FadeOut(text3), FadeOut(title3_cos), FadeOut(val3))
 
@@ -163,7 +167,7 @@ class ConstructionScene(Scene):
         desc4_bottom = Tex(
             r"Se observa que si $a \leq b$ no hay espacio libre\\en el centro. Se requiere $a > b$ para generar una\\trayectoria con radio mínimo positivo y evitar\\el centro del sistema.",
             color=BLACK, font_size=24
-        ).next_to(desc4, DOWN, buff=0.6, aligned_edge=LEFT)
+        ).next_to(desc4, DOWN, buff=0.5, aligned_edge=LEFT)
         
         a_tracker = ValueTracker(0)
         def get_elevated_curve():
@@ -174,7 +178,7 @@ class ConstructionScene(Scene):
                 color=COLOR_BLUE, stroke_width=4
             )
         elevated_curve = always_redraw(get_elevated_curve)
-        val4 = always_redraw(lambda: MathTex(f"a = {a_tracker.get_value():.2f}", color=BLACK, font_size=36).next_to(polar_plane, DOWN, buff=0.5))
+        val4 = always_redraw(lambda: MathTex(f"a = {a_tracker.get_value():.2f}", color=BLACK, font_size=32).next_to(polar_plane, DOWN, buff=0.5))
 
         self.play(Write(title4))
         self.play(Indicate(title4[1], color=COLOR_HIGHLIGHT))
@@ -187,6 +191,54 @@ class ConstructionScene(Scene):
             if a_val == 2.0: self.play(Write(desc4_bottom))
             self.wait(1.5)
 
+        self.wait(1)
+        self.play(FadeOut(elevated_curve), FadeOut(desc4), FadeOut(desc4_bottom), FadeOut(title4), FadeOut(val4))
+
+        # --- ETAPA 5: r = a + b * sin(k * theta) (Escena 5) ---
+        # Partimos con a=3, k=3, b=0
+        title5 = MathTex(r"5)\ r =", r"a +", r"b \cdot", r"\sin(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        
+        desc5 = Tex(
+            r"Mientras que $a$ define la posición media, $b$ define la\\ \textbf{intensidad} del pétalo. Es la distancia máxima que\\el brazo se aleja de su radio base. Al aumentar $b$,\\los pétalos se vuelven más prominentes.",
+            color=BLACK, font_size=24
+        ).move_to(text_anchor, aligned_edge=LEFT)
+        
+        formulas5 = MathTex(
+            r"r_{max} = a + b \quad \text{(Punta del pétalo)}\\",
+            r"r_{min} = a - b \quad \text{(Valle del pétalo)}",
+            color=BLACK, font_size=32
+        ).next_to(desc5, DOWN, buff=0.8, aligned_edge=LEFT)
+
+        b_tracker = ValueTracker(1) # Empezamos en 1 para que se vea el trébol final de la etapa 4
+        
+        def get_final_curve():
+            a = 3
+            b = b_tracker.get_value()
+            k = 3
+            return ParametricFunction(
+                lambda t: polar_plane.polar_to_point(a + b * np.sin(k * t), t),
+                t_range=[0, 2*PI],
+                color=COLOR_BLUE, stroke_width=4
+            )
+        final_curve = always_redraw(get_final_curve)
+        
+        # Monitor de variables múltiples
+        val5 = always_redraw(lambda: MathTex(
+            rf"a = 3.00, \quad b = {b_tracker.get_value():.2f}, \quad k = 3.00", 
+            color=BLACK, font_size=32
+        ).next_to(polar_plane, DOWN, buff=0.5))
+
+        self.play(Write(title5))
+        self.play(Indicate(title5[2], color=COLOR_HIGHLIGHT))
+        self.play(Write(desc5))
+        self.play(Write(formulas5))
+        self.play(Create(final_curve), Write(val5))
+        self.wait(1)
+        
+        for b_val in [2.0, 3.0]:
+            self.play(b_tracker.animate.set_value(b_val), run_time=2.5)
+            self.wait(1.5)
+
         self.wait(3)
-        self.play(FadeOut(elevated_curve), FadeOut(desc4), FadeOut(desc4_bottom), FadeOut(title4), FadeOut(val4), FadeOut(polar_plane))
+        self.play(FadeOut(final_curve), FadeOut(desc5), FadeOut(formulas5), FadeOut(title5), FadeOut(val5), FadeOut(polar_plane))
         self.wait(1)
