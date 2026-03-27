@@ -1,59 +1,67 @@
 from manim import *
 import numpy as np
 
-# Paleta de colores
-COLOR_BLUE = "#517696"
-COLOR_GRID = "#E0E0E0"
-
+# Configuración global de Manim
 config.background_color = WHITE
+
+# Colores sugeridos
+COLOR_BLUE = "#517696"
 
 class ConstructionScene(Scene):
     def construct(self):
-        # --- INTRO ---
-        intro_text = Text(
-            "¿Cómo creamos la ecuación\ndel trébol estilizado?", 
-            color=BLACK, font_size=42, font="Inter", weight=BOLD,
-            line_spacing=1.2
+        # --- ESCENA INTRO ---
+        # Usamos Tex para el formato "original de Manim"
+        intro_text = Tex(
+            r"¿Cómo creamos la ecuación\\del trébol estilizado?", 
+            color=BLACK, font_size=42
         )
         self.play(Write(intro_text))
         self.wait(2)
         self.play(FadeOut(intro_text))
 
-        # --- PLANO POLAR (Común) ---
+        # --- PLANO POLAR (Ajustado) ---
         polar_plane = PolarPlane(
             radius_max=2,
             radius_step=0.5,
             azimuth_step=30 * DEGREES,
-            size=6.0,
-            background_line_style={"stroke_color": GREY_C, "stroke_opacity": 0.6},
-            azimuth_units="degrees"
-        ).add_coordinates().shift(LEFT * 3).scale(0.85)
+            size=7.0,
+            # 'stroke_color' para que se vean los rayos (azimuth lines)
+            background_line_style={
+                "stroke_color": GREY_A,
+                "stroke_width": 1,
+                "stroke_opacity": 0.5
+            },
+            azimuth_units="degrees",
+        ).add_coordinates().shift(LEFT * 3.2).scale(0.8)
 
-        # Asegurar que las etiquetas sean negras y de tamaño adecuado
+        # Aseguramos que todas las etiquetas (radios y ángulos) sean negras (LaTeX style)
         for label in polar_plane.get_coordinate_labels():
             label.set_color(BLACK)
-            label.font_size = 14
+            label.scale(0.6) # Un poco más pequeñas para no encimarse
 
-        # Texto base para reutilizar posición a la derecha cuidando los limites
-        text_anchor = polar_plane.get_right() + RIGHT * 0.5 + UP * 2
-
-        # --- ETAPA 1: r = a (Imagen 2) ---
-        title1 = MathTex(r"1) r = a", color=BLACK).to_corner(UL).scale(1.2)
+        # --- ETAPA 1: r = a ---
+        title1 = Tex(r"1) $r = a$", color=BLACK).to_corner(UL)
+        
+        # Círculo base
         circle_a = ParametricFunction(
             lambda t: polar_plane.polar_to_point(1, t),
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
-        desc1 = Text("Radio constante,\nes un simple círculo", color=BLACK, font_size=20, line_spacing=0.8).move_to(text_anchor, aligned_edge=LEFT)
+        
+        # Texto a la derecha
+        desc1 = Tex(
+            r"Radio constante,\\es un simple círculo", 
+            color=BLACK, font_size=32
+        ).next_to(polar_plane, RIGHT, buff=1).shift(UP * 2)
 
-        self.play(Write(title1))
-        self.play(Create(polar_plane))
+        self.play(Write(title1), Create(polar_plane))
         self.play(Create(circle_a), Write(desc1))
         self.wait(2)
         self.play(FadeOut(circle_a), FadeOut(desc1), FadeOut(title1))
 
-        # --- ETAPA 2: r = cos(k * theta) (Imagen 3) ---
-        title2 = MathTex(r"2) r = \cos(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        # --- ETAPA 2: r = cos(k * theta) ---
+        title2 = Tex(r"2) $r = \cos(k \cdot \theta)$", color=BLACK).to_corner(UL)
         
         k_tracker = ValueTracker(3)
         def get_cos_curve():
@@ -65,74 +73,73 @@ class ConstructionScene(Scene):
             )
         cos_curve = always_redraw(get_cos_curve)
         
-        text2_1 = Text(
-            "Al meter el ángulo dentro de un\ncoseno, el radio deja de ser\nconstante y empieza a 'entrar y\nsalir' del centro.",
-            color=BLACK, font_size=18, line_spacing=0.8
-        ).move_to(text_anchor, aligned_edge=LEFT)
+        # Textos explicativos (divididos para controlar márgenes)
+        text2_1 = Tex(
+            r"$\bullet$ Al meter el ángulo dentro de un\\coseno, el radio deja de ser\\constante y empieza a ``entrar y\\salir'' del centro.",
+            color=BLACK, font_size=28
+        ).next_to(polar_plane, RIGHT, buff=0.8).shift(UP * 2)
         
-        text2_2 = Text(
-            "• Si k es entero: Determina el número\n  de pétalos. Si k es impar (como 7),\n  la rosa tiene k pétalos.\n  Si es par, tiene 2k.",
-            color=BLACK, font_size=18, line_spacing=0.8
-        ).next_to(text2_1, DOWN, buff=0.4, aligned_edge=LEFT)
+        text2_2 = Tex(
+            r"$\bullet$ Si $k$ es entero: Determina el\\número de pétalos. Si $k$ es impar\\(como 7), la rosa tiene $k$ pétalos.\\Si es par, tiene $2k$.",
+            color=BLACK, font_size=28
+        ).next_to(text2_1, DOWN, buff=0.5, aligned_edge=LEFT)
         
-        text2_3 = Text(
-            "• El primer pétalo nace 'acostado'\n  sobre el eje horizontal (Eje X).\n  Esto es porque cos(0) = 1\n  (máxima extensión).",
-            color=BLACK, font_size=18, line_spacing=0.8
-        ).next_to(text2_2, DOWN, buff=0.4, aligned_edge=LEFT)
+        text2_3 = Tex(
+            r"$\bullet$ El primer pétalo nace ``acostado''\\sobre el eje horizontal (Eje X).\\Esto es porque $\cos(0) = 1$\\(máxima extensión).",
+            color=BLACK, font_size=28
+        ).next_to(text2_2, DOWN, buff=0.5, aligned_edge=LEFT)
 
         self.play(Write(title2), Create(cos_curve))
         self.wait(1)
         self.play(Write(text2_1))
-        self.wait(0.5)
         
-        # Animaciones de transición deteniéndose en enteros
-        self.play(k_tracker.animate.set_value(4), run_time=1.5)
-        self.wait(1)
-        
-        self.play(k_tracker.animate.set_value(5), Write(text2_2), run_time=1.5)
-        self.wait(1)
-        
-        self.play(k_tracker.animate.set_value(6), run_time=1.5)
-        self.wait(1)
-        
-        self.play(k_tracker.animate.set_value(7), Write(text2_3), run_time=1.5)
+        # Animación de K con pausas en enteros
+        for k_val in [4, 5, 6, 7]:
+            self.play(k_tracker.animate.set_value(k_val), run_time=1.5)
+            if k_val == 5:
+                self.play(Write(text2_2))
+            if k_val == 7:
+                self.play(Write(text2_3))
+            self.wait(1)
+
         self.wait(2)
+        self.play(FadeOut(text2_1), FadeOut(text2_2), FadeOut(text2_3), FadeOut(title2))
 
-        self.play(FadeOut(cos_curve), FadeOut(text2_1), FadeOut(text2_2), FadeOut(text2_3), FadeOut(title2))
-
-        # --- ETAPA 3: r = sin(k * theta) (Imagen 4) ---
-        title3_cos = MathTex(r"3) r = \cos(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
-        title3_sin = MathTex(r"3) r = \sin(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
+        # --- ETAPA 3: r = sin(k * theta) ---
+        # Iniciamos con el título del Coseno para mostrar la transformación
+        title3_cos = Tex(r"3) $r = \cos(k \cdot \theta)$", color=BLACK).to_corner(UL)
+        title3_sin = Tex(r"3) $r = \sin(k \cdot \theta)$", color=BLACK).to_corner(UL)
         
+        # Curva actual (k=7)
         curve_3_cos = ParametricFunction(
-            lambda t: polar_plane.polar_to_point(np.cos(3 * t), t),
+            lambda t: polar_plane.polar_to_point(np.cos(7 * t), t),
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
         curve_3_sin = ParametricFunction(
-            lambda t: polar_plane.polar_to_point(np.sin(3 * t), t),
+            lambda t: polar_plane.polar_to_point(np.sin(7 * t), t),
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
         
-        text3 = Text(
-            "Primer pétalo nace 'girado'.\nEsto es porque sin(0)=0. El brazo\nempieza en el centro y el primer pico\ndel pétalo ocurre un poco después.",
-            color=BLACK, font_size=18, line_spacing=0.8
-        ).move_to(text_anchor, aligned_edge=LEFT)
+        text3 = Tex(
+            r"Primer pétalo nace ``girado''.\\Esto es porque $\sin(0)=0$.\\El brazo empieza en el centro y el\\primer pico del pétalo ocurre\\un poco después.",
+            color=BLACK, font_size=28
+        ).next_to(polar_plane, RIGHT, buff=0.8)
 
-        self.play(Write(title3_cos), Create(curve_3_cos))
-        self.wait(1.5)
+        self.play(Write(title3_cos), Transform(cos_curve, curve_3_cos))
+        self.wait(1)
         
-        # Transición de la curva del Coseno al Seno
+        # Transformación suave del Coseno al Seno
         self.play(
-            Transform(title3_cos, title3_sin), 
-            Transform(curve_3_cos, curve_3_sin),
+            Transform(title3_cos, title3_sin),
+            Transform(cos_curve, curve_3_sin),
             run_time=2
         )
         self.wait(0.5)
-        
         self.play(Write(text3))
-        self.wait(3)
+        self.wait(4)
 
-        self.play(FadeOut(curve_3_cos), FadeOut(text3), FadeOut(title3_cos), FadeOut(polar_plane))
-        self.wait(1)
+        # Limpieza final
+        self.play(FadeOut(cos_curve), FadeOut(text3), FadeOut(title3_cos), FadeOut(polar_plane))
+        self.wait(2)
