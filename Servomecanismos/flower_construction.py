@@ -9,10 +9,9 @@ config.background_color = WHITE
 class ConstructionScene(Scene):
     def construct(self):
         # --- INTRO ---
-        intro_text = Text(
-            "¿Cómo creamos la ecuación\ndel trébol estilizado?", 
-            color=BLACK, font_size=42, weight=BOLD,
-            line_spacing=1.2
+        intro_text = Tex(
+            r"¿Cómo creamos la ecuación\\del trébol estilizado?", 
+            color=BLACK, font_size=42, tex_environment="center"
         )
         self.play(Write(intro_text))
         self.wait(2)
@@ -46,23 +45,22 @@ class ConstructionScene(Scene):
             lbl.move_to(polar_plane.polar_to_point(2.0 + 0.35, angle_rad))
             azimuth_labels.add(lbl)
             
-        # Agregamos las etiquetas como hijos del plano polar para que se muevan con él
         polar_plane.add(radial_labels, azimuth_labels)
         polar_plane.shift(LEFT * 3).scale(0.85)
 
-        # Texto base para reutilizar posición a la derecha cuidando los limites
+        # Texto base para reutilizar posición a la derecha
         text_anchor = polar_plane.get_right() + RIGHT * 0.5 + UP * 2
 
-        # --- ETAPA 1: r = a (Imagen 2) ---
+        # --- ETAPA 1: r = a (Escena 1) ---
         title1 = MathTex(r"1)\ r = a", color=BLACK).to_corner(UL).scale(1.2)
         circle_a = ParametricFunction(
             lambda t: polar_plane.polar_to_point(1, t),
             t_range=[0, 2*PI],
             color=COLOR_BLUE, stroke_width=4
         )
-        desc1 = Text(
-            "Radio constante,\nes un simple círculo", 
-            color=BLACK, font_size=20, line_spacing=0.8
+        desc1 = Tex(
+            r"Radio constante,\\es un simple círculo", 
+            color=BLACK, font_size=24
         ).move_to(text_anchor, aligned_edge=LEFT)
 
         self.play(Write(title1))
@@ -71,7 +69,7 @@ class ConstructionScene(Scene):
         self.wait(2)
         self.play(FadeOut(circle_a), FadeOut(desc1), FadeOut(title1))
 
-        # --- ETAPA 2: r = cos(k * theta) (Imagen 3) ---
+        # --- ETAPA 2: r = cos(k * theta) (Escena 2) ---
         title2 = MathTex(r"2)\ r = \cos(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
         
         k_tracker = ValueTracker(3)
@@ -84,19 +82,19 @@ class ConstructionScene(Scene):
             )
         cos_curve = always_redraw(get_cos_curve)
         
-        text2_1 = Text(
-            "Al meter el ángulo dentro de un\ncoseno, el radio deja de ser\nconstante y empieza a 'entrar y\nsalir' del centro.",
-            color=BLACK, font_size=16, line_spacing=0.8
+        text2_1 = Tex(
+            r"Al meter el ángulo dentro de un\\coseno, el radio deja de ser\\constante y empieza a `entrar y\\salir' del centro.",
+            color=BLACK, font_size=20
         ).move_to(text_anchor, aligned_edge=LEFT)
         
-        text2_2 = Text(
-            "• Si k es entero: Determina el número\n  de pétalos. Si k es impar (como 7),\n  la rosa tiene k pétalos.\n  Si es par, tiene 2k.",
-            color=BLACK, font_size=16, line_spacing=0.8
+        text2_2 = Tex(
+            r"$\bullet$ Si $k$ es entero: Determina el número\\de pétalos. Si $k$ es impar (como 7),\\la rosa tiene $k$ pétalos.\\Si es par, tiene $2k$.",
+            color=BLACK, font_size=20
         ).next_to(text2_1, DOWN, buff=0.4, aligned_edge=LEFT)
         
-        text2_3 = Text(
-            "• El primer pétalo nace 'acostado'\n  sobre el eje horizontal (Eje X).\n  Esto es porque cos(0) = 1\n  (máxima extensión).",
-            color=BLACK, font_size=16, line_spacing=0.8
+        text2_3 = Tex(
+            r"$\bullet$ El primer pétalo nace `acostado'\\sobre el eje horizontal (Eje X).\\Esto es porque $\cos(0) = 1$\\(máxima extensión).",
+            color=BLACK, font_size=20
         ).next_to(text2_2, DOWN, buff=0.4, aligned_edge=LEFT)
 
         self.play(Write(title2), Create(cos_curve))
@@ -104,7 +102,7 @@ class ConstructionScene(Scene):
         self.play(Write(text2_1))
         self.wait(0.5)
         
-        # Animaciones de transición deteniéndose en enteros
+        # Animado con pausas en enteros
         self.play(k_tracker.animate.set_value(4), run_time=1.5)
         self.wait(1)
         
@@ -119,7 +117,7 @@ class ConstructionScene(Scene):
 
         self.play(FadeOut(cos_curve), FadeOut(text2_1), FadeOut(text2_2), FadeOut(text2_3), FadeOut(title2))
 
-        # --- ETAPA 3: r = sin(k * theta) (Imagen 4) ---
+        # --- ETAPA 3: r = sin(k * theta) (Escena 3) ---
         title3_cos = MathTex(r"3)\ r = \cos(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
         title3_sin = MathTex(r"3)\ r = \sin(k \cdot \theta)", color=BLACK).to_corner(UL).scale(1.2)
         
@@ -134,15 +132,14 @@ class ConstructionScene(Scene):
             color=COLOR_BLUE, stroke_width=4
         )
         
-        text3 = Text(
-            "Primer pétalo nace 'girado'.\nEsto es porque sin(0)=0. El brazo\nempieza en el centro y el primer pico\ndel pétalo ocurre un poco después.",
-            color=BLACK, font_size=16, line_spacing=0.8
+        text3 = Tex(
+            r"Primer pétalo nace `girado'.\\Esto es porque $\sin(0)=0$. El brazo\\empieza en el centro y el primer pico\\del pétalo ocurre un poco después.",
+            color=BLACK, font_size=20
         ).move_to(text_anchor, aligned_edge=LEFT)
 
         self.play(Write(title3_cos), Create(curve_3_cos))
         self.wait(1.5)
         
-        # Transición fluida de la curva del Coseno al Seno
         self.play(
             Transform(title3_cos, title3_sin), 
             Transform(curve_3_cos, curve_3_sin),
